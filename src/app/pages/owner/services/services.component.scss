@@ -1,0 +1,11 @@
+table th {
+  @apply font-medium text-gray-600 text-sm;
+}
+
+table td {
+  @apply text-sm;
+}
+
+button {
+  @apply hover:underline;
+}

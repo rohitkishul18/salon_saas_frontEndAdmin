@@ -1,1 +1,126 @@
-<p>locations works!</p>
+<div class="space-y-6">
+
+  <!-- Page Title + Add Button -->
+  <div class="flex justify-between items-center">
+    <h2 class="text-xl font-semibold">Salon Locations</h2>
+
+    <button 
+      (click)="openAddModal()" 
+      class="px-4 py-2 bg-black text-white rounded-lg hover:bg-gray-800"
+    >
+      + Add Location
+    </button>
+  </div>
+
+  <!-- Location List -->
+  <div class="bg-white rounded-xl shadow p-4">
+
+    <table class="w-full">
+      <thead>
+        <tr class="border-b">
+          <th class="py-3 text-left">Name</th>
+          <th class="py-3 text-left">Address</th>
+          <th class="py-3 text-left">Phone</th>
+          <th class="py-3 text-left">Timing</th>
+          <th class="py-3 text-center">Actions</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr 
+          *ngFor="let loc of locations" 
+          class="border-b hover:bg-gray-50"
+        >
+          <td class="py-2">{{ loc.name }}</td>
+          <td class="py-2">{{ loc.address }}</td>
+          <td class="py-2">{{ loc.phone }}</td>
+          <td class="py-2">{{ loc.openingHours }}</td>
+
+          <td class="py-2 text-center">
+            <button 
+              class="text-blue-600 mr-3"
+              (click)="openEditModal(loc)"
+            >
+              Edit
+            </button>
+
+            <button 
+              class="text-red-600"
+              (click)="deleteLocation(loc)"
+            >
+              Delete
+            </button>
+          </td>
+        </tr>
+      </tbody>
+
+    </table>
+
+    <!-- Empty -->
+    <p *ngIf="locations.length === 0" class="text-center py-4 text-gray-500">
+      No locations added yet.
+    </p>
+
+  </div>
+
+  <!-- Modal -->
+  <div 
+    *ngIf="showModal" 
+    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center"
+  >
+    <div class="bg-white p-6 rounded-xl shadow-lg w-96">
+
+      <h3 class="text-lg font-semibold mb-4">
+        {{ isEdit ? 'Edit Location' : 'Add Location' }}
+      </h3>
+
+      <div class="space-y-3">
+        <input 
+          type="text" 
+          [(ngModel)]="form.name" 
+          placeholder="Location Name" 
+          class="input-box"
+        />
+
+        <input 
+          type="text" 
+          [(ngModel)]="form.address" 
+          placeholder="Address" 
+          class="input-box"
+        />
+
+        <input 
+          type="text" 
+          [(ngModel)]="form.phone" 
+          placeholder="Phone Number" 
+          class="input-box"
+        />
+
+        <input 
+          type="text" 
+          [(ngModel)]="form.timing" 
+          placeholder="Timing (e.g., 10AM - 8PM)" 
+          class="input-box"
+        />
+      </div>
+
+      <div class="flex justify-end mt-5 space-x-3">
+        <button 
+          (click)="closeModal()" 
+          class="px-4 py-2 bg-gray-200 rounded-lg"
+        >
+          Cancel
+        </button>
+
+        <button 
+          (click)="saveLocation()" 
+          class="px-4 py-2 bg-black text-white rounded-lg"
+        >
+          {{ isEdit ? 'Update' : 'Save' }}
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+</div>

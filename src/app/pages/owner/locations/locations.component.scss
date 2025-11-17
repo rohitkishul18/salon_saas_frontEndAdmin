@@ -1,0 +1,11 @@
+.input-box {
+  @apply w-full border rounded-lg p-2;
+}
+
+table th {
+  @apply font-medium text-gray-600;
+}
+
+table td {
+  @apply text-sm;
+}

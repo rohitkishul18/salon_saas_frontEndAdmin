@@ -11,6 +11,7 @@ import { ServicesComponent } from './pages/owner/services/services.component';
 import { GalleryComponent } from './pages/owner/gallery/gallery.component';
 import { authGuard } from './core/guards/auth.guard';
 import { BookingComponent } from './pages/owner/booking/booking.component';
+import { LayoutdashbordComponent } from './pages/superadmin/layoutdashbord/layoutdashbord.component';
 
 const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -18,31 +19,29 @@ const routes: Routes = [
   { path: 'register', component: RegisterComponent }, // optional if needed
 
   // Superadmin Routes
-  {
-    path: 'superadmin',
-    component: DashboardComponentSuperAdmin ,
-    canActivate: [authGuard],
-    data: { roles: ['superadmin'] },
-    children: [
-      { path: 'dashboard', component: DashboardComponentSuperAdmin },
-      { path: 'salons', component: SalonsComponent },
-      // Add more superadmin routes here if needed
-    ]
-  },
-
-  // Salon Owner Routes
+{
+  path: 'superadmin',
+  component: LayoutdashbordComponent,
+  canActivate: [authGuard],
+  data: { roles: ['superadmin'] },
+  children: [
+    { path: '', redirectTo: 'layoutdashbord', pathMatch: 'full' },
+    { path: 'dashboard', component: DashboardComponentSuperAdmin }, 
+    { path: 'salons', component: SalonsComponent }
+  ]
+},
+// Salon Owner Routes
  {
   path: 'salon-owner',
   component: SalonInfoComponent,
   canActivate: [authGuard],
   data: { roles: ['salon-owner'] },
   children: [
+    { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
     { path: 'dashboard', component: DashboardComponent },
     { path: 'locations', component: LocationsComponent },
     { path: 'services', component: ServicesComponent },
      {path:'booking',component:BookingComponent},
-    { path: 'gallery', component: GalleryComponent },
-    { path: '', redirectTo: 'dashboard', pathMatch: 'full' }
   ]
 },
   // Wildcard redirect

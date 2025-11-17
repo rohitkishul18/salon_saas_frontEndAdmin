@@ -1,0 +1,18 @@
+<div class="layout-wrapper">
+
+  <!-- Sidebar -->
+  <app-sidebar [role]="'superadmin'"></app-sidebar>
+
+  <!-- Main content -->
+  <div class="main-content">
+
+    <!-- Navbar -->
+    <app-navbar></app-navbar>
+
+    <!-- Page content -->
+    <div class="page-body">
+      <router-outlet></router-outlet>
+    </div>
+
+  </div>
+</div>

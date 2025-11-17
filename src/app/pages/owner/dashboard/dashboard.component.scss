@@ -1,0 +1,25 @@
+.stat-card {
+  @apply bg-white p-4 rounded-xl shadow;
+  h3 {
+    @apply text-sm text-gray-600;
+  }
+  p {
+    @apply text-2xl font-bold mt-2;
+  }
+}
+
+.card {
+  @apply bg-white p-4 rounded-xl shadow;
+}
+
+.title {
+  @apply text-lg font-semibold mb-3;
+}
+
+.booking-item {
+  @apply flex justify-between py-2 border-b border-gray-100;
+}
+
+.complete {
+  @apply text-green-600 font-semibold;
+}

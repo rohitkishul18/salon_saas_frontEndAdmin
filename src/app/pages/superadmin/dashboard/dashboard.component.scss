@@ -1,0 +1,7 @@
+/* Simple styling, Tailwind handles most */
+:host {
+  display: block;
+  background-color: #f9fafb; /* Light gray background */
+  min-height: 100%;
+  font-family: 'Inter', sans-serif;
+}

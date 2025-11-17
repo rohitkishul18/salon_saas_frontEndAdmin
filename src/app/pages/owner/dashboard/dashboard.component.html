@@ -1,1 +1,77 @@
-<p>dashboard works!</p>
+<div *ngIf="loading" class="text-center py-10 text-gray-500">
+  Loading dashboard...
+</div>
+
+<div *ngIf="!loading" class="space-y-6">
+
+  <!-- Stats -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+    <div class="stat-card">
+      <h3>Today's Bookings</h3>
+      <p>{{ stats.todayBookings }}</p>
+    </div>
+
+    <div class="stat-card">
+      <h3>Upcoming</h3>
+      <p>{{ stats.upcoming }}</p>
+    </div>
+
+    <div class="stat-card">
+      <h3>Total Services</h3>
+      <p>{{ stats.services }}</p>
+    </div>
+
+    <div class="stat-card">
+      <h3>Total Locations</h3>
+      <p>{{ stats.locations }}</p>
+    </div>
+  </div>
+
+  <!-- Appointment + Recent -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+
+    <!-- Next Appointment -->
+    <div class="card md:col-span-1">
+      <h2 class="title">Next Appointment</h2>
+
+      <div *ngIf="nextAppointment; else noNext">
+        <p><strong>{{ nextAppointment.customer }}</strong></p>
+        <p>{{ nextAppointment.service }}</p>
+        <p>{{ nextAppointment.time }}</p>
+        <p class="text-sm text-gray-500">{{ nextAppointment.location }}</p>
+      </div>
+
+      <ng-template #noNext>
+        <p class="text-gray-500 text-sm">No upcoming appointments</p>
+      </ng-template>
+    </div>
+
+    <!-- Recent Bookings -->
+    <div class="card md:col-span-2">
+      <h2 class="title">Recent Bookings</h2>
+
+      <div *ngFor="let b of recentBookings" class="booking-item">
+        <p>{{ b.customer }} → {{ b.service }}</p>
+        <span class="text-sm text-gray-500">{{ b.date }}</span>
+      </div>
+
+      <p *ngIf="recentBookings.length === 0"
+         class="text-gray-500 text-sm mt-4">
+        No bookings found.
+      </p>
+    </div>
+
+  </div>
+
+  <!-- Salon Setup Status -->
+  <div class="card">
+    <h2 class="title">Salon Setup Status</h2>
+
+    <div class="space-y-2">
+      <p [class.complete]="status.info">✔ Salon Info</p>
+      <p [class.complete]="status.services">✔ Services Added</p>
+      <p [class.complete]="status.locations">✔ Locations Added</p>
+    </div>
+  </div>
+
+</div>

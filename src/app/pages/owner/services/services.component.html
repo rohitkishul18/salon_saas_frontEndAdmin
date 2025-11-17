@@ -1,1 +1,141 @@
-<p>services works!</p>
+<div class="space-y-6">
+
+  <!-- Header -->
+  <div class="flex justify-between items-center">
+    <h2 class="text-xl font-semibold">Salon Services</h2>
+
+    <button 
+      class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+      (click)="openModal(false)"
+    >
+      + Add Service
+    </button>
+  </div>
+
+  <!-- Services Table -->
+  <div class="bg-white shadow rounded-xl p-4">
+
+    <table class="w-full">
+      <thead>
+        <tr class="border-b bg-gray-50">
+          <th class="py-3 text-left">Service Name</th>
+          <th class="py-3 text-left">Duration</th>
+          <th class="py-3 text-left">Price</th>
+          <th class="py-3 text-left">Location</th>
+          <th class="py-3 text-center">Actions</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr 
+          *ngFor="let item of services"
+          class="border-b hover:bg-gray-50"
+        >
+          <td class="py-2">{{ item.name }}</td>
+          <td class="py-2">{{ item.durationMinutes }} mins</td>
+          <td class="py-2">₹{{ item.price }}</td>
+          <td class="py-2">{{ item.locationId?.name || '-' }}</td>
+
+          <td class="py-2 text-center space-x-3">
+            <button class="text-blue-600" (click)="openModal(true, item)">Edit</button>
+            <button class="text-red-600" (click)="deleteService(item)">Delete</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Empty Message -->
+    <p *ngIf="services.length === 0" class="text-center py-3 text-gray-500">
+      No services added yet.
+    </p>
+
+  </div>
+
+  <!-- Modal -->
+  <div 
+    *ngIf="showModal"
+    class="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center"
+  >
+    <div class="bg-white p-6 w-96 rounded-xl shadow-lg">
+      <h3 class="text-lg font-semibold mb-4">
+        {{ isEditing ? 'Edit Service' : 'Add Service' }}
+      </h3>
+
+      <form (submit)="saveService()">
+
+        <div class="space-y-3">
+
+          <!-- Name -->
+          <div>
+            <label class="text-sm font-medium">Service Name</label>
+            <input 
+              type="text" 
+              class="w-full border rounded-lg px-3 py-2"
+              [(ngModel)]="form.name"
+              name="name"
+              required
+            />
+          </div>
+
+          <!-- Duration -->
+          <div>
+            <label class="text-sm font-medium">Duration (mins)</label>
+            <input 
+              type="number" 
+              class="w-full border rounded-lg px-3 py-2"
+              [(ngModel)]="form.durationMinutes"
+              name="durationMinutes"
+              required
+            />
+          </div>
+
+          <!-- Price -->
+          <div>
+            <label class="text-sm font-medium">Price (₹)</label>
+            <input 
+              type="number" 
+              class="w-full border rounded-lg px-3 py-2"
+              [(ngModel)]="form.price"
+              name="price"
+              required
+            />
+          </div>
+
+          <!-- Location ID -->
+          <div>
+            <label class="text-sm font-medium">Location ID</label>
+            <input 
+              type="text"
+              class="w-full border rounded-lg px-3 py-2"
+              [(ngModel)]="form.locationId"
+              name="locationId"
+              required
+            />
+          </div>
+
+        </div>
+
+        <!-- Buttons -->
+        <div class="flex justify-end space-x-3 mt-5">
+          <button 
+            class="px-4 py-2 bg-gray-200 rounded-lg"
+            type="button"
+            (click)="closeModal()"
+          >
+            Cancel
+          </button>
+
+          <button 
+            class="px-4 py-2 bg-blue-600 text-white rounded-lg"
+            type="submit"
+          >
+            Save
+          </button>
+        </div>
+
+      </form>
+
+    </div>
+  </div>
+
+</div>

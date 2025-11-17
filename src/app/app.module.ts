@@ -20,6 +20,7 @@ import { TokenInterceptor } from './core/interceptors/token.interceptor';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { BookingComponent } from './pages/owner/booking/booking.component';
+import { LayoutdashbordComponent } from './pages/superadmin/layoutdashbord/layoutdashbord.component';
 
 
 @NgModule({
@@ -39,6 +40,7 @@ import { BookingComponent } from './pages/owner/booking/booking.component';
     ServicesComponent,
     GalleryComponent,
     BookingComponent,
+    LayoutdashbordComponent,
   ],
   imports: [
     BrowserModule,
