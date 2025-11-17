@@ -1,0 +1,33 @@
+<div class="sidebar-container bg-gray-900 text-white h-full w-60 flex flex-col shadow-xl">
+
+  <!-- Close button for mobile -->
+  <button class="close-btn hidden md:hidden absolute top-4 right-4 text-white" (click)="closeSidebar()">
+    ✖
+  </button>
+
+  <!-- Logo -->
+  <div class="p-5 text-center border-b border-gray-700">
+    <h1 class="text-xl font-bold tracking-wide">
+      <span class="text-blue-400">Salon</span> SaaS
+    </h1>
+  </div>
+
+  <!-- Menu -->
+  <nav class="flex-1 mt-4">
+    <ul class="space-y-1 px-3">
+      <li *ngFor="let item of menuItems">
+        <button
+          (click)="navigateTo(item.route)"
+          class="flex items-center w-full px-4 py-3 rounded-lg transition-all duration-200 text-left"
+          [ngClass]="{
+            'bg-blue-600 text-white shadow-md': isActive(item.route),
+            'hover:bg-gray-800': !isActive(item.route)
+          }"
+        >
+          <span class="text-lg mr-3">{{item.icon}}</span>
+          <span class="text-sm font-medium">{{item.label}}</span>
+        </button>
+      </li>
+    </ul>
+  </nav>
+</div>

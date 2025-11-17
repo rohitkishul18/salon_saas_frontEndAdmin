@@ -1,0 +1,20 @@
+<nav class="w-full bg-white shadow-md flex items-center justify-end px-6 py-3">
+
+  <div class="flex items-center space-x-6">
+
+    <!-- User Role -->
+    <span class="text-gray-600 text-sm font-medium">
+      {{ role | uppercase }}
+    </span>
+
+    <!-- Logout -->
+    <button 
+      class="text-red-600 hover:text-red-700 font-medium"
+      (click)="logout()"
+    >
+      Logout
+    </button>
+
+  </div>
+
+</nav>
