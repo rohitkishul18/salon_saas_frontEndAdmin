@@ -1,48 +1,70 @@
 <div class="p-6 space-y-6">
 
-  <!-- Page Title -->
   <h2 class="text-2xl font-bold">All Salons</h2>
 
-  <!-- Salons Table -->
-  <div class="bg-white p-4 rounded-lg shadow">
-    <table class="w-full table-auto border-collapse">
-      <thead>
-        <tr class="bg-gray-100">
-          <th class="p-2 text-left border-b">Salon Name</th>
-          <th class="p-2 text-left border-b">Owner</th>
-          <th class="p-2 text-left border-b">Email</th>
-          <th class="p-2 text-left border-b">Phone</th>
-          <th class="p-2 text-left border-b">Status</th>
-          <th class="p-2 text-left border-b">Created At</th>
-          <th class="p-2 text-left border-b">Action</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let salon of salons" class="hover:bg-gray-50">
-          <td class="p-2 border-b">{{salon.name}}</td>
-          <td class="p-2 border-b">{{salon.ownerName}}</td>
-          <td class="p-2 border-b">{{salon.email}}</td>
-          <td class="p-2 border-b">{{salon.phone}}</td>
-          <td class="p-2 border-b">
-            <span [ngClass]="{
-              'text-green-600 font-semibold': salon.active,
-              'text-red-600 font-semibold': !salon.active
-            }">
-              {{salon.active ? 'Active' : 'Inactive'}}
-            </span>
-          </td>
-          <td class="p-2 border-b">{{salon.createdAt | date:'shortDate'}}</td>
-          <td class="p-2 border-b">
-            <button 
-              class="px-3 py-1 rounded-lg text-white font-semibold"
-              [ngClass]="salon.active ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600'"
-              (click)="toggleStatus(salon)">
-              {{salon.active ? 'Deactivate' : 'Activate'}}
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+  <div class="bg-white p-4 rounded-xl shadow">
+
+    <div *ngIf="loading" class="text-center py-6 text-gray-500">
+      Loading salons...
+    </div>
+
+    <div *ngIf="!loading && salons.length === 0" class="text-center py-6 text-gray-500">
+      No salons found.
+    </div>
+
+    <div *ngIf="!loading && salons.length > 0" class="overflow-x-auto">
+      <table class="w-full table-auto border-collapse">
+        <thead>
+          <tr class="bg-gray-100 text-gray-600 text-sm">
+            <th class="p-2 text-left border-b">Salon Name</th>
+            <th class="p-2 text-left border-b">Owner</th>
+            <th class="p-2 text-left border-b">Email</th>
+            <th class="p-2 text-left border-b">Phone</th>
+            <th class="p-2 text-left border-b">Status</th>
+            <th class="p-2 text-left border-b">Created At</th>
+            <th class="p-2 text-left border-b">Action</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let salon of salons" class="hover:bg-gray-50 transition">
+            <td class="p-2 border-b font-medium">{{ salon.name }}</td>
+            <td class="p-2 border-b">{{ salon.ownerName }}</td>
+            <td class="p-2 border-b">{{ salon.email }}</td>
+            <td class="p-2 border-b">{{ salon.phone }}</td>
+
+            <!-- FIXED STATUS -->
+            <td class="p-2 border-b">
+              <span class="font-semibold"
+                [ngClass]="{
+                    'text-green-600': salon.ownerActive,
+                    'text-red-600': !salon.ownerActive
+                }"
+              >
+                {{ salon.ownerActive ? 'Active' : 'Inactive' }}
+              </span>
+            </td>
+
+            <td class="p-2 border-b">
+              {{ salon.createdAt | date: 'mediumDate' }}
+            </td>
+
+            <!-- FIXED ACTION BUTTON -->
+            <td class="p-2 border-b">
+              <button
+                class="px-3 py-1 rounded-lg text-white font-semibold"
+                [ngClass]="salon.ownerActive ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600'"
+                (click)="toggleStatus(salon)"
+              >
+                {{ salon.ownerActive ? 'Deactivate' : 'Activate' }}
+              </button>
+            </td>
+
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
   </div>
 
 </div>

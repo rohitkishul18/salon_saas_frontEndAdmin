@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { SuperadminService } from '../../../core/services/superadmin.service';
 
 @Component({
   selector: 'app-dashboard-superadmin',
@@ -6,20 +7,41 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./dashboard.component.scss']
 })
 export class DashboardComponentSuperAdmin implements OnInit {
-  
-  totalSalons = 12;       // Dummy data
-  totalOwners = 8;        // Dummy data
-  totalBookings = 45;     // Dummy data
 
-  recentSalons = [
-    { name: 'Glamour Salon', ownerName: 'Alice', active: true, createdAt: new Date('2025-11-01') },
-    { name: 'Urban Cuts', ownerName: 'Bob', active: false, createdAt: new Date('2025-11-05') },
-    { name: 'Style Studio', ownerName: 'Charlie', active: true, createdAt: new Date('2025-11-08') },
-  ];
+  loading = true;
 
-  constructor() { }
+  totalSalons = 0;
+  totalOwners = 0;
+  totalBookings = 0;
+
+  recentSalons: any[] = [];
+
+  constructor(private dashboardService: SuperadminService) {}
 
   ngOnInit(): void {
+    this.loadDashboardData();
+  }
+
+  loadDashboardData() {
+    this.loading = true;
+
+    this.dashboardService.getDashboardStats().subscribe({
+      next: (res: any) => {
+        const data = res.data;
+
+        this.totalSalons = data?.salon?.total || 0;
+        this.totalOwners = data?.recentSalons.length || 0;
+        this.totalBookings = data?.bookings?.total || 0;
+        this.recentSalons = data?.recentSalons || [];
+        this.loading = false;
+      },
+
+      error: () => {
+        this.loading = false;
+        // Swal.fire('Error', 'Failed to load dashboard', 'error');
+        alert('Failed to load dashboard');
+      }
+    });
   }
 
 }
