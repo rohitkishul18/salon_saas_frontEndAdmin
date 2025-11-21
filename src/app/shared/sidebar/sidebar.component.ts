@@ -9,6 +9,9 @@ import { Router } from '@angular/router';
 export class SidebarComponent implements OnInit {
 
   @Input() role: 'superadmin' | 'salon-owner' = 'salon-owner';
+  @Input() userName: string = 'User';
+  @Input() showUserInfo: boolean = true;
+  @Input() isOpen: boolean = true; // For mobile toggle
 
   menuItems: any[] = [];
 
@@ -36,16 +39,29 @@ export class SidebarComponent implements OnInit {
     }
   }
 
-  isActive(route: string) {
+  isActive(route: string): boolean {
     return this.router.url.startsWith(route);
   }
 
   navigateTo(route: string) {
     this.router.navigate([route]);
+    // Auto-close sidebar on mobile after navigation
+    if (window.innerWidth <= 768) {
+      this.closeSidebar();
+    }
   }
 
-  /** NEW — Close sidebar for mobile */
   closeSidebar() {
+    this.isOpen = false;
     document.body.classList.remove('sidebar-open');
+  }
+
+  getUserInitials(): string {
+    return this.userName
+      .split(' ')
+      .map(n => n[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
   }
 }

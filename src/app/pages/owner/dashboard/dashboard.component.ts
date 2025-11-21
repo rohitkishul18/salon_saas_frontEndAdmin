@@ -24,7 +24,6 @@ export class DashboardComponent implements OnInit {
   status: any = {
     info: false,
     services: false,
-    gallery: false,
     locations: false
   };
 
@@ -35,19 +34,30 @@ export class DashboardComponent implements OnInit {
   }
 
   loadDashboard() {
+    this.loading = true;
     this.salonService.getDashboard().subscribe({
       next: (res: any) => {
-        this.stats = res.stats;
-        this.nextAppointment = res.nextAppointment;
-        this.recentBookings = res.recentBookings;
-        this.status = res.status;
+        console.log(res);
+        this.stats = res.stats || this.stats;
+        this.nextAppointment = res.nextAppointment || null;
+        this.recentBookings = res.recentBookings || [];
+        this.status = res.status || this.status;
         this.loading = false;
       },
       error: (err) => {
         this.loading = false;
-        // Swal.fire('Error', 'Failed to load dashboard', 'error');
         alert('Failed to load dashboard');
       }
     });
   }
+
+  getInitials(name: string): string {
+    return name
+      .split(' ')
+      .map(n => n[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  }
+
 }

@@ -29,17 +29,14 @@ export class LocationsComponent implements OnInit {
   ngOnInit(): void {
     this.getLocations();
   }
-
-  // ============================
-  // GET LOCATIONS
-  // ============================
+  
   getLocations() {
     this.loading = true;
 
     this.locationService.getLocations().subscribe({
       next: (res) => {
         console.log(res);
-        this.locations = res.data;
+        this.locations = res.data || [];
         this.loading = false;
       },
       error: () => {
@@ -50,18 +47,12 @@ export class LocationsComponent implements OnInit {
     });
   }
 
-  // ============================
-  // OPEN ADD MODAL
-  // ============================
   openAddModal() {
     this.isEdit = false;
     this.form = { name: '', address: '', phone: '', timing: '' };
     this.showModal = true;
   }
 
-  // ============================
-  // OPEN EDIT MODAL
-  // ============================
   openEditModal(loc: any) {
     this.isEdit = true;
     this.editId = loc._id;
@@ -76,16 +67,11 @@ export class LocationsComponent implements OnInit {
     this.showModal = true;
   }
 
-  // ============================
-  // CLOSE MODAL
-  // ============================
   closeModal() {
     this.showModal = false;
+    this.form = { name: '', address: '', phone: '', timing: '' };
   }
 
-  // ============================
-  // SAVE (CREATE / UPDATE)
-  // ============================
   saveLocation() {
     if (this.isEdit) {
       this.updateLocation();
@@ -150,4 +136,14 @@ export class LocationsComponent implements OnInit {
     });
   }
 }
+
+  getLocationInitial(name: string): string {
+    return name
+      .split(' ')
+      .map(n => n[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  }
+
 }

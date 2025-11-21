@@ -1,85 +1,168 @@
-<div class="p-6 space-y-6">
-  <!-- Dashboard Title -->
-  <div class="flex justify-between items-center">
-    <h2 class="text-2xl font-bold">SuperAdmin Dashboard</h2>
+<div class="dashboard-wrapper">
+  
+  <!-- Animated Background Elements -->
+  <div class="background-shapes">
+    <span class="shape shape-1"></span>
+    <span class="shape shape-2"></span>
+    <span class="shape shape-3"></span>
   </div>
 
-  <!-- Summary Cards -->
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-    <div class="bg-white p-4 rounded-xl shadow">
-      <h3 class="text-gray-500 text-sm">Total Salons</h3>
-      <p class="text-3xl font-bold mt-1">{{ totalSalons }}</p>
+  <div class="dashboard-container">
+    
+    <!-- Dashboard Header -->
+    <div class="dashboard-header">
+      <div class="header-content">
+        <h2 class="dashboard-title">SuperAdmin Dashboard</h2>
+        <p class="dashboard-subtitle">Welcome back! Here's what's happening today</p>
+      </div>
+      <button class="refresh-btn" (click)="loadDashboardData()" [disabled]="loading">
+        <span class="refresh-icon" [class.spinning]="loading">🔄</span>
+        <span>Refresh</span>
+      </button>
     </div>
 
-    <div class="bg-white p-4 rounded-xl shadow">
-      <h3 class="text-gray-500 text-sm">Total Owners</h3>
-      <p class="text-3xl font-bold mt-1">{{ totalOwners }}</p>
+    <!-- Summary Cards -->
+    <div class="stats-grid">
+      
+      <!-- Total Salons Card -->
+      <div class="stat-card salon-card">
+        <div class="stat-icon">
+          <span>🏢</span>
+        </div>
+        <div class="stat-content">
+          <h3 class="stat-label">Total Salons</h3>
+          <p class="stat-value" *ngIf="!loading">{{ totalSalons }}</p>
+          <p class="stat-value skeleton" *ngIf="loading">---</p>
+          <!-- <span class="stat-trend positive">↗ +12% this month</span> -->
+        </div>
+        <div class="stat-decoration"></div>
+      </div>
+
+      <!-- Total Owners Card -->
+      <div class="stat-card owner-card">
+        <div class="stat-icon">
+          <span>👥</span>
+        </div>
+        <div class="stat-content">
+          <h3 class="stat-label">Total Owners</h3>
+          <p class="stat-value" *ngIf="!loading">{{ totalOwners }}</p>
+          <p class="stat-value skeleton" *ngIf="loading">---</p>
+          <!-- <span class="stat-trend positive">↗ +8% this month</span> -->
+        </div>
+        <div class="stat-decoration"></div>
+      </div>
+
+      <!-- Total Bookings Card -->
+      <div class="stat-card booking-card">
+        <div class="stat-icon">
+          <span>📅</span>
+        </div>
+        <div class="stat-content">
+          <h3 class="stat-label">Total Bookings</h3>
+          <p class="stat-value" *ngIf="!loading">{{ totalBookings }}</p>
+          <p class="stat-value skeleton" *ngIf="loading">---</p>
+          <!-- <span class="stat-trend positive">↗ +24% this month</span> -->
+        </div>
+        <div class="stat-decoration"></div>
+      </div>
+
     </div>
 
-    <div class="bg-white p-4 rounded-xl shadow">
-      <h3 class="text-gray-500 text-sm">Total Bookings</h3>
-      <p class="text-3xl font-bold mt-1">{{ totalBookings }}</p>
+    <!-- Recent Salons Section -->
+    <div class="table-section">
+      
+      <div class="section-header">
+        <div>
+          <h3 class="section-title">Recent Salons</h3>
+          <p class="section-subtitle">Latest registered salons in your system</p>
+        </div>
+        <!-- <button class="view-all-btn">
+          <span>View All</span>
+          <span class="arrow">→</span>
+        </button> -->
+      </div>
+
+      <!-- Loading State -->
+      <div *ngIf="loading" class="loading-state">
+        <div class="spinner"></div>
+        <p>Loading salon data...</p>
+      </div>
+
+      <!-- Empty State -->
+      <div *ngIf="!loading && recentSalons.length === 0" class="empty-state">
+        <div class="empty-icon">🏪</div>
+        <h4>No Salons Yet</h4>
+        <p>No recent salons found in the system</p>
+      </div>
+
+      <!-- Table -->
+      <div *ngIf="!loading && recentSalons.length > 0" class="table-container">
+        <table class="modern-table">
+          <thead>
+            <tr>
+              <th>
+                <span class="th-content">
+                  <span class="th-icon">🏢</span>
+                  Salon Name
+                </span>
+              </th>
+              <th>
+                <span class="th-content">
+                  <span class="th-icon">👤</span>
+                  Owner
+                </span>
+              </th>
+              <th>
+                <span class="th-content">
+                  <span class="th-icon">📊</span>
+                  Status
+                </span>
+              </th>
+              <th>
+                <span class="th-content">
+                  <span class="th-icon">📅</span>
+                  Created At
+                </span>
+              </th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr *ngFor="let salon of recentSalons; let i = index" 
+                class="table-row"
+                [style.animation-delay]="(i * 0.1) + 's'">
+              
+              <td>
+                <div class="salon-name">
+                  <div class="salon-avatar">
+                    {{ getSalonInitial(salon.name) }}
+                  </div>
+                  <span class="font-medium">{{ salon.name }}</span>
+                </div>
+              </td>
+
+              <td>
+                <span class="owner-name">{{ salon.name }}</span>
+              </td>
+
+              <td>
+                <span class="status-badge" [class.active]="salon.isActive" [class.inactive]="!salon.isActive">
+                  <span class="status-dot"></span>
+                  {{ salon.isActive ? "Active" : "Inactive" }}
+                </span>
+              </td>
+
+              <td>
+                <span class="date-text">
+                  {{ salon.createdAt | date : "MMM d, y" }}
+                </span>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
     </div>
-  </div>
 
-  <!-- Recent Salons Table -->
-  <div class="bg-white p-4 rounded-xl shadow">
-    <div class="flex justify-between items-center mb-4">
-      <h3 class="text-lg font-semibold">Recent Salons</h3>
-    </div>
-
-    <!-- If loading -->
-    <div *ngIf="loading" class="text-center py-6 text-gray-500">
-      Loading data...
-    </div>
-
-    <!-- If empty -->
-    <div
-      *ngIf="!loading && recentSalons.length === 0"
-      class="text-center py-6 text-gray-500"
-    >
-      No recent salons found.
-    </div>
-
-    <!-- Table -->
-    <table
-      *ngIf="!loading && recentSalons.length > 0"
-      class="w-full table-auto border-collapse"
-    >
-      <thead>
-        <tr class="bg-gray-100 text-sm text-gray-600">
-          <th class="p-2 text-left border-b">Salon Name</th>
-          <th class="p-2 text-left border-b">Owner</th>
-          <th class="p-2 text-left border-b">Status</th>
-          <th class="p-2 text-left border-b">Created At</th>
-        </tr>
-      </thead>
-
-      <tbody>
-        <tr
-          *ngFor="let salon of recentSalons"
-          class="hover:bg-gray-50 transition"
-        >
-          <td class="p-2 border-b font-medium">{{ salon.name }}</td>
-          <td class="p-2 border-b">{{ salon.name }}</td>
-
-          <td class="p-2 border-b">
-            <span
-              class="font-semibold"
-              [ngClass]="{
-                'text-green-600': salon.isActive,
-                'text-red-600': !salon.isActive
-              }"
-            >
-              {{ salon.isActive ? "Active" : "Inactive" }}
-            </span>
-          </td>
-
-          <td class="p-2 border-b">
-            {{ salon.createdAt | date : "mediumDate" }}
-          </td>
-        </tr>
-      </tbody>
-    </table>
   </div>
 </div>

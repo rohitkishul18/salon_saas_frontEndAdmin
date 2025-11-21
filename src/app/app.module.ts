@@ -21,6 +21,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { BookingComponent } from './pages/owner/booking/booking.component';
 import { LayoutdashbordComponent } from './pages/superadmin/layoutdashbord/layoutdashbord.component';
+import { ForgetPasswordComponent } from './pages/auth/forget-password/forget-password.component';
 
 
 @NgModule({
@@ -41,6 +42,7 @@ import { LayoutdashbordComponent } from './pages/superadmin/layoutdashbord/layou
     GalleryComponent,
     BookingComponent,
     LayoutdashbordComponent,
+    ForgetPasswordComponent,
   ],
   imports: [
     BrowserModule,

@@ -18,4 +18,8 @@ export class BookingService {
   updateStatus(id: string, status: string): Observable<any> {
     return this.http.put(`${this.baseUrl}/${id}/status`, { status });
   }
+
+  deleteBooking(id: string): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/${id}`);
+  } 
 }

@@ -39,20 +39,44 @@ export class ServicesComponent implements OnInit {
     return confirm(msg);
   }
 
-  openModal(edit: boolean, data: any = null) {
+  getServiceInitial(name: string): string {
+    return name
+      .split(' ')
+      .map(n => n[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
+  }
+
+ openModal(edit: boolean, data: any = null) {
     this.isEditing = edit;
-    this.form = edit ? { ...data } : {
+    console.log(edit, data);  
+    if (edit) {
+      this.form = { 
+        ...data, 
+        locationId: data.locationId?._id || '' 
+      };
+    } else {
+      this.form = {
+        id: null,
+        name: '',
+        durationMinutes: '',
+        price: '',
+        locationId: ''
+      };
+    }
+    this.showModal = true;
+  }
+
+  closeModal() {
+    this.showModal = false;
+    this.form = {
       id: null,
       name: '',
       durationMinutes: '',
       price: '',
       locationId: ''
     };
-    this.showModal = true;
-  }
-
-  closeModal() {
-    this.showModal = false;
   }
 
   // ------------------------------

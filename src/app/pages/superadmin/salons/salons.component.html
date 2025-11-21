@@ -1,70 +1,237 @@
-<div class="p-6 space-y-6">
+<div class="salons-wrapper">
+  
+  <!-- Background Decoration -->
+  <div class="background-shapes">
+    <span class="shape shape-1"></span>
+    <span class="shape shape-2"></span>
+  </div>
 
-  <h2 class="text-2xl font-bold">All Salons</h2>
+  <div class="salons-container">
 
-  <div class="bg-white p-4 rounded-xl shadow">
-
-    <div *ngIf="loading" class="text-center py-6 text-gray-500">
-      Loading salons...
+    <!-- Page Header -->
+    <div class="page-header">
+      <div class="header-content">
+        <h2 class="page-title">All Salons</h2>
+        <p class="page-subtitle">Manage all registered salons in your system</p>
+      </div>
+      <div class="header-actions">
+        <button class="action-btn refresh" (click)="loadSalons()" [disabled]="loading">
+          <span class="btn-icon" [class.spinning]="loading">🔄</span>
+          <span>Refresh</span>
+        </button>
+        <button class="action-btn primary">
+          <span class="btn-icon">➕</span>
+          <span>Add Salon</span>
+        </button>
+      </div>
     </div>
 
-    <div *ngIf="!loading && salons.length === 0" class="text-center py-6 text-gray-500">
-      No salons found.
+    <!-- Stats Overview -->
+    <div class="stats-overview">
+      <div class="stat-item">
+        <div class="stat-icon active">✓</div>
+        <div class="stat-info">
+          <span class="stat-label">Active Salons</span>
+          <span class="stat-value">{{ getActiveSalonsCount() }}</span>
+        </div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-icon inactive">✕</div>
+        <div class="stat-info">
+          <span class="stat-label">Inactive Salons</span>
+          <span class="stat-value">{{ getInactiveSalonsCount() }}</span>
+        </div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-icon total">📊</div>
+        <div class="stat-info">
+          <span class="stat-label">Total Salons</span>
+          <span class="stat-value">{{ salons.length }}</span>
+        </div>
+      </div>
     </div>
 
-    <div *ngIf="!loading && salons.length > 0" class="overflow-x-auto">
-      <table class="w-full table-auto border-collapse">
-        <thead>
-          <tr class="bg-gray-100 text-gray-600 text-sm">
-            <th class="p-2 text-left border-b">Salon Name</th>
-            <th class="p-2 text-left border-b">Owner</th>
-            <th class="p-2 text-left border-b">Email</th>
-            <th class="p-2 text-left border-b">Phone</th>
-            <th class="p-2 text-left border-b">Status</th>
-            <th class="p-2 text-left border-b">Created At</th>
-            <th class="p-2 text-left border-b">Action</th>
-          </tr>
-        </thead>
+    <!-- Main Table Section -->
+    <div class="table-section">
 
-        <tbody>
-          <tr *ngFor="let salon of salons" class="hover:bg-gray-50 transition">
-            <td class="p-2 border-b font-medium">{{ salon.name }}</td>
-            <td class="p-2 border-b">{{ salon.ownerName }}</td>
-            <td class="p-2 border-b">{{ salon.email }}</td>
-            <td class="p-2 border-b">{{ salon.phone }}</td>
+      <!-- Search & Filter Bar -->
+      <div class="toolbar">
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input 
+            type="text" 
+            placeholder="Search salons by name, email, or phone..."
+            [(ngModel)]="searchTerm"
+            (input)="filterSalons()"
+          />
+        </div>
+        <div class="filter-group">
+          <button 
+            class="filter-btn" 
+            [class.active]="filterStatus === 'all'"
+            (click)="setFilter('all')">
+            All
+          </button>
+          <button 
+            class="filter-btn" 
+            [class.active]="filterStatus === 'active'"
+            (click)="setFilter('active')">
+            Active
+          </button>
+          <button 
+            class="filter-btn" 
+            [class.active]="filterStatus === 'inactive'"
+            (click)="setFilter('inactive')">
+            Inactive
+          </button>
+        </div>
+      </div>
 
-            <!-- FIXED STATUS -->
-            <td class="p-2 border-b">
-              <span class="font-semibold"
-                [ngClass]="{
-                    'text-green-600': salon.ownerActive,
-                    'text-red-600': !salon.ownerActive
-                }"
-              >
-                {{ salon.ownerActive ? 'Active' : 'Inactive' }}
-              </span>
-            </td>
+      <!-- Loading State -->
+      <div *ngIf="loading" class="loading-state">
+        <div class="spinner"></div>
+        <p>Loading salons data...</p>
+      </div>
 
-            <td class="p-2 border-b">
-              {{ salon.createdAt | date: 'mediumDate' }}
-            </td>
+      <!-- Empty State -->
+      <div *ngIf="!loading && filteredSalons.length === 0" class="empty-state">
+        <div class="empty-icon">🏪</div>
+        <h4>No Salons Found</h4>
+        <p *ngIf="searchTerm">Try adjusting your search criteria</p>
+        <p *ngIf="!searchTerm">No salons registered in the system yet</p>
+      </div>
 
-            <!-- FIXED ACTION BUTTON -->
-            <td class="p-2 border-b">
-              <button
-                class="px-3 py-1 rounded-lg text-white font-semibold"
-                [ngClass]="salon.ownerActive ? 'bg-red-500 hover:bg-red-600' : 'bg-green-500 hover:bg-green-600'"
-                (click)="toggleStatus(salon)"
-              >
-                {{ salon.ownerActive ? 'Deactivate' : 'Activate' }}
-              </button>
-            </td>
+      <!-- Salons Table -->
+      <div *ngIf="!loading && filteredSalons.length > 0" class="table-wrapper">
+        <table class="modern-table">
+          <thead>
+            <tr>
+              <th>
+                <span class="th-content">
+                  <span class="th-icon">🏢</span>
+                  Salon Name
+                </span>
+              </th>
+              <th>
+                <span class="th-content">
+                  <span class="th-icon">👤</span>
+                  Owner
+                </span>
+              </th>
+              <th>
+                <span class="th-content">
+                  <span class="th-icon">📧</span>
+                  Email
+                </span>
+              </th>
+              <th>
+                <span class="th-content">
+                  <span class="th-icon">📱</span>
+                  Phone
+                </span>
+              </th>
+              <th>
+                <span class="th-content">
+                  <span class="th-icon">📊</span>
+                  Status
+                </span>
+              </th>
+              <th>
+                <span class="th-content">
+                  <span class="th-icon">📅</span>
+                  Created At
+                </span>
+              </th>
+              <th>
+                <span class="th-content">
+                  <span class="th-icon">⚡</span>
+                  Action
+                </span>
+              </th>
+            </tr>
+          </thead>
 
-          </tr>
-        </tbody>
-      </table>
+          <tbody>
+            <tr *ngFor="let salon of filteredSalons; let i = index" 
+                class="table-row"
+                [style.animation-delay]="(i * 0.05) + 's'">
+              
+              <!-- Salon Name with Avatar -->
+              <td>
+                <div class="salon-info">
+                  <div class="salon-avatar">
+                    {{ getSalonInitial(salon.name) }}
+                  </div>
+                  <span class="salon-name">{{ salon.name }}</span>
+                </div>
+              </td>
+
+              <!-- Owner Name -->
+              <td>
+                <span class="owner-name">{{ salon.ownerName }}</span>
+              </td>
+
+              <!-- Email -->
+              <td>
+                <div class="contact-info">
+                  <span class="contact-text">{{ salon.email }}</span>
+                </div>
+              </td>
+
+              <!-- Phone -->
+              <td>
+                <div class="contact-info">
+                  <span class="contact-text">{{ salon.phone }}</span>
+                </div>
+              </td>
+
+              <!-- Status Badge -->
+              <td>
+                <span 
+                  class="status-badge" 
+                  [class.active]="salon.ownerActive" 
+                  [class.inactive]="!salon.ownerActive">
+                  <span class="status-dot"></span>
+                  {{ salon.ownerActive ? 'Active' : 'Inactive' }}
+                </span>
+              </td>
+
+              <!-- Created Date -->
+              <td>
+                <span class="date-text">
+                  {{ salon.createdAt | date: 'MMM d, y' }}
+                </span>
+              </td>
+
+              <!-- Action Button -->
+              <td>
+                <button
+                  class="action-toggle-btn"
+                  [class.deactivate]="salon.ownerActive"
+                  [class.activate]="!salon.ownerActive"
+                  (click)="toggleStatus(salon)"
+                  [disabled]="salon.isUpdating">
+                  <span class="btn-icon" *ngIf="!salon.isUpdating">
+                    {{ salon.ownerActive ? '🔴' : '✅' }}
+                  </span>
+                  <span class="btn-spinner" *ngIf="salon.isUpdating">⏳</span>
+                  <span>{{ salon.ownerActive ? 'Deactivate' : 'Activate' }}</span>
+                </button>
+              </td>
+
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination (Optional) -->
+      <div class="table-footer" *ngIf="!loading && filteredSalons.length > 0">
+        <p class="results-info">
+          Showing <strong>{{ filteredSalons.length }}</strong> of <strong>{{ salons.length }}</strong> salons
+        </p>
+      </div>
+
     </div>
 
   </div>
-
 </div>

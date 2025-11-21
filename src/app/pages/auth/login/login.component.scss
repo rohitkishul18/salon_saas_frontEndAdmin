@@ -205,24 +205,9 @@
 
   .form-options {
     display: flex;
-    justify-content: space-between;
+    justify-content: end;
     align-items: center;
     margin-bottom: 1.5rem;
-
-    .remember-me {
-      display: flex;
-      align-items: center;
-      cursor: pointer;
-      font-size: 0.9rem;
-      color: #4a5568;
-
-      input[type="checkbox"] {
-        margin-right: 0.5rem;
-        width: 18px;
-        height: 18px;
-        cursor: pointer;
-      }
-    }
 
     .forgot-password {
       color: #667eea;

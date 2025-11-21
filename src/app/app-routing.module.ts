@@ -12,11 +12,13 @@ import { GalleryComponent } from './pages/owner/gallery/gallery.component';
 import { authGuard } from './core/guards/auth.guard';
 import { BookingComponent } from './pages/owner/booking/booking.component';
 import { LayoutdashbordComponent } from './pages/superadmin/layoutdashbord/layoutdashbord.component';
+import { ForgetPasswordComponent } from './pages/auth/forget-password/forget-password.component';
 
 const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent }, // optional if needed
+  {path:'forgot-password',component:ForgetPasswordComponent},
 
   // Superadmin Routes
 {

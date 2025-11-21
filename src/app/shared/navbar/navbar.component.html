@@ -1,20 +1,36 @@
-<nav class="w-full bg-white shadow-md flex items-center justify-end px-6 py-3">
+<nav class="navbar-container">
 
-  <div class="flex items-center space-x-6">
+  <!-- Shimmer overlay for animation -->
+  <div class="shimmer-overlay"></div>
 
-    <!-- User Role -->
-    <span class="text-gray-600 text-sm font-medium">
-      {{ role | uppercase }}
-    </span>
+  <div class="navbar-content">
+    <!-- Logo section (optional, can be hidden on mobile) -->
+    <div class="logo-section">
+      <div class="logo-icon">
+        💇
+      </div>
+      <h1>
+        <span class="highlight">Salon</span> SaaS
+      </h1>
+      <p>Manage with Style</p>
+    </div>
 
-    <!-- Logout -->
-    <button 
-      class="text-red-600 hover:text-red-700 font-medium"
-      (click)="logout()"
-    >
-      Logout
-    </button>
+    <!-- User actions -->
+    <div class="user-actions">
+      <!-- User Role -->
+      <span class="role-badge">
+        {{ role | titlecase }} Role
+      </span>
 
+      <!-- Logout -->
+      <button 
+        class="logout-btn"
+        (click)="logout()"
+      >
+        <span class="icon">🚪</span>
+        <span class="label">Logout</span>
+      </button>
+    </div>
   </div>
 
 </nav>

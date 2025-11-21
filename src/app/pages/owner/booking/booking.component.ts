@@ -14,6 +14,10 @@ export class BookingComponent implements OnInit {
   showDetails = false;
   selected: any = null;
 
+  showStatusModal = false;
+  currentBooking: any = null;
+  newStatus: string = '';
+
   constructor(private bookingService: BookingService) {}
 
   ngOnInit() {
@@ -25,7 +29,7 @@ export class BookingComponent implements OnInit {
 
     this.bookingService.getBookings().subscribe({
       next: (res: any) => {
-        this.bookings = res.data;  // backend sends data inside res.data
+        this.bookings = res.data || [];  // backend sends data inside res.data
         this.loading = false;
       },
       error: () => {
@@ -42,41 +46,65 @@ export class BookingComponent implements OnInit {
 
   closeDetails() {
     this.showDetails = false;
+    this.selected = null;
   }
 
+  openStatusModal(booking: any) {
+    this.currentBooking = booking;
+    this.newStatus = booking.status;
+    this.showStatusModal = true;
+  }
 
-  changeStatus(booking: any) {
-    const newStatus = prompt(
-      "Enter new status (pending, confirmed, cancelled, done):",
-      booking.status
-    );
+  closeStatusModal() {
+    this.showStatusModal = false;
+    this.currentBooking = null;
+    this.newStatus = '';
+  }
 
-    if (!newStatus) return;
+  updateStatus() {
+    if (this.newStatus === this.currentBooking.status) {
+      return;
+    }
 
     const allowed = ["pending", "confirmed", "cancelled", "done"];
-    if (!allowed.includes(newStatus)) {
+    if (!allowed.includes(this.newStatus)) {
       alert("Invalid status!");
       return;
     }
 
-    this.bookingService.updateStatus(booking._id, newStatus).subscribe({
+    this.bookingService.updateStatus(this.currentBooking._id, this.newStatus).subscribe({
       next: () => {
-        booking.status = newStatus; // update UI
+        this.currentBooking.status = this.newStatus; // update UI
         alert("Status updated successfully!");
+        this.closeStatusModal();
       },
       error: () => {
         alert("Failed to update status");
+        this.closeStatusModal();
       }
     });
   }
 
-
   deleteBooking(booking: any) {
     const ok = confirm("Delete this booking?");
     if (!ok) return;
+    this.bookingService.deleteBooking(booking._id).subscribe({
+      next: () => {
+        this.loadBookings();
+      },
+      error: () => {
+        alert("Failed to delete booking");
+      }
+    })
+  }
 
-    this.bookings = this.bookings.filter(b => b._id !== booking._id);
-    alert("Booking removed from table (backend delete not implemented)");
+  getCustomerInitial(name: string): string {
+    return name
+      .split(' ')
+      .map(n => n[0])
+      .join('')
+      .toUpperCase()
+      .slice(0, 2);
   }
 
 }

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 
 @Component({
@@ -6,10 +6,14 @@ import { Router } from '@angular/router';
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.scss'],
 })
-export class NavbarComponent {
-  role = localStorage.getItem('role') || '';
+export class NavbarComponent implements OnInit {
+  role: string = '';
 
   constructor(private router: Router) {}
+
+  ngOnInit() {
+    this.role = localStorage.getItem('role') || '';
+  }
 
   logout() {
     localStorage.removeItem('token');
