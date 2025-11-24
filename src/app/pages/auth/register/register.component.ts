@@ -8,8 +8,7 @@ import { AuthService } from '../../../core/services/auth.service';
   styleUrls: ['./register.component.scss']
 })
 export class RegisterComponent {
-
-  // Bind all form fields
+  // Form fields
   salonName: string = '';
   ownerName: string = '';
   email: string = '';
@@ -17,54 +16,214 @@ export class RegisterComponent {
   password: string = '';
   termsAccepted: boolean = false;
 
+  // UI state
+  isLoading: boolean = false;
+  errorMessage: string = '';
+  fieldErrors: { [key: string]: string } = {};
+
   constructor(private authService: AuthService, private router: Router) {}
 
-   register() {
+  /**
+   * Validate all form fields
+   */
+  private validateForm(): boolean {
+    this.fieldErrors = {};
+    this.errorMessage = '';
+    let isValid = true;
+
+    // Salon Name validation
+    if (!this.salonName || this.salonName.trim().length === 0) {
+      this.fieldErrors['salonName'] = 'Salon name is required';
+      isValid = false;
+    } else if (this.salonName.trim().length < 3) {
+      this.fieldErrors['salonName'] = 'Salon name must be at least 3 characters';
+      isValid = false;
+    }
+
+    // Owner Name validation
+    if (!this.ownerName || this.ownerName.trim().length === 0) {
+      this.fieldErrors['ownerName'] = 'Owner name is required';
+      isValid = false;
+    } else if (this.ownerName.trim().length < 2) {
+      this.fieldErrors['ownerName'] = 'Owner name must be at least 2 characters';
+      isValid = false;
+    } else if (!/^[a-zA-Z\s]+$/.test(this.ownerName.trim())) {
+      this.fieldErrors['ownerName'] = 'Owner name should only contain letters';
+      isValid = false;
+    }
+
+    // Email validation
+    if (!this.email || this.email.trim().length === 0) {
+      this.fieldErrors['email'] = 'Email is required';
+      isValid = false;
+    } else if (!this.isValidEmail(this.email)) {
+      this.fieldErrors['email'] = 'Please enter a valid email address';
+      isValid = false;
+    }
+
+    // Phone validation (optional but if provided, must be valid)
+    if (this.phone && this.phone.trim().length > 0) {
+      const phoneDigits = this.phone.replace(/\D/g, '');
+      if (phoneDigits.length !== 10) {
+        this.fieldErrors['phone'] = 'Phone number must be 10 digits';
+        isValid = false;
+      }
+    }
+
+    // Password validation
+    if (!this.password || this.password.length === 0) {
+      this.fieldErrors['password'] = 'Password is required';
+      isValid = false;
+    } else if (this.password.length < 8) {
+      this.fieldErrors['password'] = 'Password must be at least 8 characters';
+      isValid = false;
+    } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(this.password)) {
+      this.fieldErrors['password'] = 'Password must contain uppercase, lowercase, and number';
+      isValid = false;
+    }
+
+    // Terms acceptance validation
     if (!this.termsAccepted) {
-     alert('Please accept the terms and conditions');
+      this.errorMessage = 'Please accept the terms and conditions';
+      isValid = false;
+    }
+
+    return isValid;
+  }
+
+  /**
+   * Email validation helper
+   */
+  private isValidEmail(email: string): boolean {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email.trim());
+  }
+
+  /**
+   * Store user data in localStorage
+   */
+  private storeUserData(responseData: any): void {
+    try {
+      // Store token
+      if (responseData.token) {
+        localStorage.setItem('token', responseData.token);
+      }
+
+      // Store user role
+      if (responseData.user?.role) {
+        localStorage.setItem('role', responseData.user.role);
+      }
+
+      // Store salon ID
+      if (responseData.user?.salonId) {
+        localStorage.setItem('salonId', JSON.stringify(responseData.user.salonId));
+      } else {
+        localStorage.setItem('salonId', '');
+      }
+
+      // Store complete user object
+      if (responseData.user) {
+        localStorage.setItem('user', JSON.stringify(responseData.user));
+      }
+    } catch (error) {
+      console.error('Error storing user data:', error);
+    }
+  }
+
+  /**
+   * Navigate based on user role
+   */
+  private navigateBasedOnRole(role: string): void {
+    switch (role) {
+      case 'superadmin':
+        this.router.navigate(['/superadmin/dashboard']);
+        break;
+      case 'salon-owner':
+        this.router.navigate(['/salon-owner/dashboard']);
+        break;
+      default:
+        this.router.navigate(['/login']);
+    }
+  }
+
+  /**
+   * Clear error for specific field
+   */
+  clearFieldError(fieldName: string): void {
+    if (this.fieldErrors[fieldName]) {
+      delete this.fieldErrors[fieldName];
+    }
+    if (this.errorMessage) {
+      this.errorMessage = '';
+    }
+  }
+
+  /**
+   * Register user
+   */
+  register(): void {
+    // Validate form
+    if (!this.validateForm()) {
       return;
     }
 
-    if (!this.salonName || !this.ownerName || !this.email || !this.password) {
-      alert('Please fill in all required fields');
-      return;
-    }
+    // Set loading state
+    this.isLoading = true;
+    this.errorMessage = '';
 
+    // Prepare payload
     const payload = {
-      salonName: this.salonName,
-      ownerName: this.ownerName,
-      email: this.email,
-      phone: this.phone,
+      salonName: this.salonName.trim(),
+      ownerName: this.ownerName.trim(),
+      email: this.email.trim().toLowerCase(),
+      phone: this.phone.trim(),
       password: this.password
     };
 
+    // Call registration API
     this.authService.register(payload).subscribe({
       next: (res: any) => {
-        // Save token & role if backend returns immediately
-        if (res.data.token && res.data.user?.role) {
-          localStorage.setItem('token', res.data.token);
-          localStorage.setItem('role', res.data.user.role);
+        this.isLoading = false;
 
-         alert('Registration successful');
+        // Store user data in localStorage
+        if (res.data) {
+          this.storeUserData(res.data);
 
-          // Role-based navigation
-          if(res.data.user.role === 'superadmin') {
-            this.router.navigate(['/superadmin/dashboard']);
-          } else if(res.data.user.role === 'salon-owner') {
-            this.router.navigate(['/salon-owner/dashboard']);
+          // Navigate based on role
+          if (res.data.user?.role) {
+            this.navigateBasedOnRole(res.data.user.role);
           } else {
-            this.router.navigate(['/login']); // fallback
+            // If no role returned, redirect to login
+            this.router.navigate(['/login']);
           }
         } else {
-          // If backend does not return token, redirect to login
-          alert('Registration successful');
+          // Registration successful but no data returned
           this.router.navigate(['/login']);
         }
       },
       error: (err) => {
-        alert(err.error.message);
+        this.isLoading = false;
+
+        // Handle different error types
+        if (err.error?.message) {
+          this.errorMessage = err.error.message;
+        } else if (err.error?.error) {
+          this.errorMessage = err.error.error;
+        } else if (err.status === 0) {
+          this.errorMessage = 'Network error. Please check your connection.';
+        } else if (err.status === 409) {
+          this.errorMessage = 'Email already registered. Please use a different email.';
+        } else if (err.status === 400) {
+          this.errorMessage = 'Invalid registration data. Please check your inputs.';
+        } else if (err.status >= 500) {
+          this.errorMessage = 'Server error. Please try again later.';
+        } else {
+          this.errorMessage = 'Registration failed. Please try again.';
+        }
+
+        // Scroll to top to show error
+        window.scrollTo({ top: 0, behavior: 'smooth' });
       }
     });
   }
-
 }

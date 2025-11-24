@@ -21,6 +21,22 @@
       </button>
     </div>
 
+    <!-- Global Error Message -->
+    <div class="error-banner" *ngIf="errorMessage && !loading">
+      <div class="error-content">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="12" y1="8" x2="12" y2="12"></line>
+          <line x1="12" y1="16" x2="12.01" y2="16"></line>
+        </svg>
+        <span>{{ errorMessage }}</span>
+      </div>
+      <div class="error-actions">
+        <button class="retry-btn" (click)="retryLoad()">Retry</button>
+        <button class="dismiss-btn" (click)="clearError()">×</button>
+      </div>
+    </div>
+
     <!-- Loading State -->
     <div *ngIf="loading" class="loading-state">
       <div class="spinner"></div>
@@ -28,7 +44,7 @@
     </div>
 
     <!-- Empty State -->
-    <div *ngIf="!loading && bookings.length === 0" class="empty-state">
+    <div *ngIf="!loading && bookings.length === 0 && !errorMessage" class="empty-state">
       <div class="empty-icon">📅</div>
       <h4>No Bookings Yet</h4>
       <p>Your booking history will appear here once customers start scheduling</p>
@@ -40,7 +56,9 @@
       <div class="section-header">
         <div>
           <h3 class="section-title">All Bookings</h3>
-          <p class="section-subtitle">{{ bookings.length }} booking{{ bookings.length !== 1 ? 's' : '' }} found</p>
+          <p class="section-subtitle">
+            Showing {{ getShowingFrom() }} to {{ getShowingTo() }} of {{ totalItems }} booking{{ totalItems !== 1 ? 's' : '' }}
+          </p>
         </div>
       </div>
 
@@ -61,12 +79,18 @@
                   Phone
                 </span>
               </th>
-              <!-- <th>
+              <th>
+                <span class="th-content">
+                  <span class="th-icon">🏢</span>
+                  Branch
+                </span>
+              </th>
+              <th>
                 <span class="th-content">
                   <span class="th-icon">💇‍♀️</span>
                   Service
                 </span>
-              </th> -->
+              </th>
               <th>
                 <span class="th-content">
                   <span class="th-icon">📅</span>
@@ -118,9 +142,15 @@
                 <span class="phone-text">{{ b.customerPhone }}</span>
               </td>
 
-              <!-- <td>
-                <span class="service-text">{{ b.serviceId?.title }}</span>
-              </td> -->
+              <td>
+                <div class="branch-info">
+                  <span class="branch-badge">{{ getBranchName(b) }}</span>
+                </div>
+              </td>
+
+              <td>
+                <span class="service-text">{{ getServiceTitle(b) }}</span>
+              </td>
 
               <td>
                 <span class="date-text">{{ b.scheduledAt | date:'MMM d, y' }}</span>
@@ -131,7 +161,7 @@
               </td>
 
               <td>
-                <span class="amount-text">₹{{ b.serviceId?.price }}</span>
+                <span class="amount-text">₹{{ getServicePrice(b) }}</span>
               </td>
 
               <td>
@@ -151,6 +181,7 @@
                   <button 
                     class="action-btn view-btn"
                     (click)="viewDetails(b)"
+                    title="View Details"
                   >
                     <span class="icon">👁️</span>
                     <span>View</span>
@@ -158,6 +189,7 @@
                   <button 
                     class="action-btn status-btn"
                     (click)="openStatusModal(b)"
+                    title="Change Status"
                   >
                     <span class="icon">🔄</span>
                     <span>Status</span>
@@ -165,6 +197,7 @@
                   <button 
                     class="action-btn delete-btn"
                     (click)="deleteBooking(b)"
+                    title="Delete Booking"
                   >
                     <span class="icon">🗑️</span>
                     <span>Delete</span>
@@ -174,6 +207,37 @@
             </tr>
           </tbody>
         </table>
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination-section">
+        <div class="pagination-info">
+          <span>Page {{ currentPage }} of {{ totalPages }}</span>
+        </div>
+        <div class="pagination-controls">
+          <button 
+            class="pag-btn" 
+            (click)="changePage(currentPage - 1)"
+            [disabled]="currentPage === 1"
+          >
+            <span>‹ Previous</span>
+          </button>
+          <button 
+            *ngFor="let page of getVisiblePages()"
+            class="pag-btn"
+            [class.active]="page === currentPage"
+            (click)="changePage(page)"
+          >
+            {{ page }}
+          </button>
+          <button 
+            class="pag-btn" 
+            (click)="changePage(currentPage + 1)"
+            [disabled]="currentPage === totalPages"
+          >
+            <span>Next ›</span>
+          </button>
+        </div>
       </div>
 
     </div>
@@ -197,31 +261,35 @@
       <div class="modal-body">
         <div class="booking-details-grid">
           <div class="detail-item">
-            <label>Customer</label>
+            <label>Customer Name</label>
             <p>{{ selected?.customerName }}</p>
           </div>
           <div class="detail-item">
-            <label>Phone</label>
+            <label>Phone Number</label>
             <p>{{ selected?.customerPhone }}</p>
           </div>
           <div class="detail-item">
+            <label>Branch Location</label>
+            <p>{{ getBranchName(selected) }}</p>
+          </div>
+          <div class="detail-item">
             <label>Service</label>
-            <p>{{ selected?.serviceId?.title }}</p>
+            <p>{{ getServiceTitle(selected) }}</p>
           </div>
           <div class="detail-item">
-            <label>Date</label>
-            <p>{{ selected?.scheduledAt | date:'MMM d, y' }}</p>
+            <label>Appointment Date</label>
+            <p>{{ selected?.scheduledAt | date:'fullDate' }}</p>
           </div>
           <div class="detail-item">
-            <label>Time</label>
+            <label>Appointment Time</label>
             <p>{{ selected?.scheduledAt | date:'shortTime' }}</p>
           </div>
           <div class="detail-item">
-            <label>Amount</label>
-            <p>₹{{ selected?.serviceId?.price }}</p>
+            <label>Service Amount</label>
+            <p class="amount-highlight">₹{{ getServicePrice(selected) }}</p>
           </div>
-          <div class="detail-item full-width">
-            <label>Status</label>
+          <div class="detail-item">
+            <label>Booking Status</label>
             <p>
               <span class="status-badge" 
                     [ngClass]="{
@@ -233,6 +301,14 @@
                 {{ selected?.status | titlecase }}
               </span>
             </p>
+          </div>
+          <div class="detail-item full-width" *ngIf="selected?.notes">
+            <label>Notes</label>
+            <p class="notes-text">{{ selected?.notes }}</p>
+          </div>
+          <div class="detail-item full-width">
+            <label>Booked On</label>
+            <p>{{ selected?.createdAt | date:'medium' }}</p>
           </div>
         </div>
       </div>
@@ -263,20 +339,45 @@
       </div>
 
       <div class="modal-body">
-        <p class="mb-4">Current status: <strong>{{ currentBooking?.status | titlecase }}</strong></p>
+        <!-- Error Message in Modal -->
+        <div class="modal-error" *ngIf="errorMessage">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <line x1="12" y1="8" x2="12" y2="12"></line>
+            <line x1="12" y1="16" x2="12.01" y2="16"></line>
+          </svg>
+          <span>{{ errorMessage }}</span>
+        </div>
+
+        <div class="booking-summary">
+          <p><strong>Customer:</strong> {{ currentBooking?.customerName }}</p>
+          <p><strong>Branch:</strong> {{ getBranchName(currentBooking) }}</p>
+          <p><strong>Current Status:</strong> 
+            <span class="status-badge" 
+                  [ngClass]="{
+                    'status-pending': currentBooking?.status === 'pending',
+                    'status-confirmed': currentBooking?.status === 'confirmed',
+                    'status-cancelled': currentBooking?.status === 'cancelled',
+                    'status-done': currentBooking?.status === 'done'
+                  }">
+              {{ currentBooking?.status | titlecase }}
+            </span>
+          </p>
+        </div>
         
         <div class="form-group">
-          <label class="form-label">New Status</label>
+          <label class="form-label">Select New Status</label>
           <select 
             [(ngModel)]="newStatus" 
             name="status"
             class="form-input"
+            [disabled]="isUpdating"
             required
           >
-            <option value="pending">Pending</option>
-            <option value="confirmed">Confirmed</option>
-            <option value="cancelled">Cancelled</option>
-            <option value="done">Done</option>
+            <option value="pending">⏳ Pending</option>
+            <option value="confirmed">✅ Confirmed</option>
+            <option value="cancelled">❌ Cancelled</option>
+            <option value="done">✔️ Done</option>
           </select>
         </div>
       </div>
@@ -285,15 +386,20 @@
         <button 
           (click)="closeStatusModal()" 
           class="btn btn-secondary"
+          [disabled]="isUpdating"
         >
           Cancel
         </button>
         <button 
           (click)="updateStatus()" 
           class="btn btn-primary"
-          [disabled]="newStatus === currentBooking?.status"
+          [disabled]="newStatus === currentBooking?.status || isUpdating"
         >
-          Update Status
+          <span *ngIf="!isUpdating">Update Status</span>
+          <span *ngIf="isUpdating" class="loading-text">
+            <span class="mini-spinner"></span>
+            Updating...
+          </span>
         </button>
       </div>
     </div>

@@ -1,12 +1,14 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
+import { environment } from 'src/environments/environment';  // <-- Import environment
 
 @Injectable({
   providedIn: 'root'
 })
 export class SalonService {
 
-  private baseUrl = 'http://localhost:5000/api/admin/dashboard';
+  // Use environment API URL
+  private baseUrl = `${environment.apiBaseUrl}/admin/dashboard`;
 
   constructor(private http: HttpClient) {}
 

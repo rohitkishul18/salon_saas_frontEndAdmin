@@ -11,6 +11,12 @@ export class ServicesComponent implements OnInit {
   services: any[] = [];
   loading = false;
 
+  // Pagination
+  currentPage = 1;
+  itemsPerPage = 5;
+  totalItems = 0;
+  totalPages = 0;
+
   showModal = false;
   isEditing = false;
 
@@ -48,7 +54,7 @@ export class ServicesComponent implements OnInit {
       .slice(0, 2);
   }
 
- openModal(edit: boolean, data: any = null) {
+  openModal(edit: boolean, data: any = null) {
     this.isEditing = edit;
     console.log(edit, data);  
     if (edit) {
@@ -82,11 +88,15 @@ export class ServicesComponent implements OnInit {
   // ------------------------------
   // LOAD SERVICES
   // ------------------------------
-  loadServices() {
+  loadServices(page?: number) {
+    const p = page || this.currentPage;
     this.loading = true;
-    this.serviceApi.getServices().subscribe({
+    this.serviceApi.getServices(p, this.itemsPerPage).subscribe({
       next: (res: any) => {
-        this.services = res.data || [];
+        this.services = res.data?.data || res.data || [];
+        this.totalItems = res.data?.pagination?.total || res.pagination?.total || 0;
+        this.totalPages = res.data?.pagination?.pages || res.pagination?.pages || 0;
+        this.currentPage = p;
         this.loading = false;
       },
       error: () => {
@@ -94,6 +104,45 @@ export class ServicesComponent implements OnInit {
         this.loading = false;
       }
     });
+  }
+
+  changePage(page: number) {
+    if (page < 1 || page > this.totalPages) return;
+    this.loadServices(page);
+  }
+
+  getVisiblePages(): number[] {
+    const delta = 2;
+    const range = [];
+    const rangeWithEllipsis = [];
+
+    for (let i = Math.max(2, this.currentPage - delta); i <= Math.min(this.totalPages - 1, this.currentPage + delta); i++) {
+      range.push(i);
+    }
+
+    if (this.currentPage - delta > 2) {
+      rangeWithEllipsis.push(1, -1); // -1 represents ellipsis
+    } else {
+      rangeWithEllipsis.push(1);
+    }
+
+    rangeWithEllipsis.push(...range);
+
+    if (this.currentPage + delta < this.totalPages - 1) {
+      rangeWithEllipsis.push(-1, this.totalPages);
+    } else {
+      rangeWithEllipsis.push(this.totalPages);
+    }
+
+    return rangeWithEllipsis.filter(p => p !== -1); // Filter out ellipsis for now; can add logic to show '...' if needed
+  }
+
+  getShowingFrom(): number {
+    return (this.currentPage - 1) * this.itemsPerPage + 1;
+  }
+
+  getShowingTo(): number {
+    return Math.min(this.currentPage * this.itemsPerPage, this.totalItems);
   }
 
   // ------------------------------

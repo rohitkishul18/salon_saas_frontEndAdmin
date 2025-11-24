@@ -11,7 +11,7 @@ export class SidebarComponent implements OnInit {
   @Input() role: 'superadmin' | 'salon-owner' = 'salon-owner';
   @Input() userName: string = 'User';
   @Input() showUserInfo: boolean = true;
-  @Input() isOpen: boolean = true; // For mobile toggle
+  @Input() isOpen: boolean = true; // Default true to match original; parent can control for mobile
 
   menuItems: any[] = [];
 
@@ -22,21 +22,28 @@ export class SidebarComponent implements OnInit {
   }
 
   setupMenu() {
-    if (this.role === 'superadmin') {
-      this.menuItems = [
-        { label: 'Dashboard', icon: '📊', route: '/superadmin/dashboard' },
-        { label: 'Salons', icon: '🏢', route: '/superadmin/salons' },
-      ];
+    // Use switch for clarity and extensibility
+    switch (this.role) {
+      case 'superadmin':
+        this.menuItems = [
+          { label: 'Dashboard', icon: '📊', route: '/superadmin/dashboard' },
+          { label: 'Salons', icon: '🏢', route: '/superadmin/salons' },
+        ];
+        break;
+      case 'salon-owner':
+      default:
+        this.menuItems = [
+          { label: 'Dashboard', icon: '📊', route: '/salon-owner/dashboard' },
+          { label: 'Locations', icon: '📍', route: '/salon-owner/locations' },
+          { label: 'Bookings', icon: '📅', route: '/salon-owner/booking' },
+          { label: 'Services', icon: '💇‍♂️', route: '/salon-owner/services' },
+        ];
+        break;
     }
+  }
 
-    if (this.role === 'salon-owner') {
-      this.menuItems = [
-        { label: 'Dashboard', icon: '📊', route: '/salon-owner/dashboard' },
-        { label: 'Locations', icon: '📍', route: '/salon-owner/locations' },
-        { label: 'Bookings', icon: '📅', route: '/salon-owner/booking' },
-        { label: 'Services', icon: '💇‍♂️', route: '/salon-owner/services' },
-      ];
-    }
+  trackByFn(index: number, item: any): string {
+    return item.route;
   }
 
   isActive(route: string): boolean {

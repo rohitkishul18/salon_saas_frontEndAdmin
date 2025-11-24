@@ -38,6 +38,7 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94); // Smooth cubic-bezier for production polish
 
   // Animated overlay effect
   &::before {
@@ -76,9 +77,16 @@
     backdrop-filter: blur(10px);
     z-index: 10;
 
-    &:hover {
+    &:hover,
+    &:focus {
       background: rgba(255, 255, 255, 0.3);
       transform: rotate(90deg);
+      outline: 2px solid rgba(255, 255, 255, 0.5);
+      outline-offset: 2px;
+    }
+
+    &:focus-visible {
+      outline: 2px solid rgba(255, 255, 255, 0.8);
     }
   }
 
@@ -186,6 +194,26 @@
           position: relative;
           overflow: hidden;
 
+          &:hover,
+          &:focus {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            transform: translateX(5px);
+
+            &::before {
+              width: 100%;
+            }
+
+            .icon {
+              transform: scale(1.2) rotate(5deg);
+            }
+          }
+
+          &:focus-visible {
+            outline: 2px solid rgba(255, 255, 255, 0.5);
+            outline-offset: 2px;
+          }
+
           &::before {
             content: '';
             position: absolute;
@@ -211,20 +239,6 @@
             flex: 1;
             position: relative;
             z-index: 1;
-          }
-
-          &:hover {
-            background: rgba(255, 255, 255, 0.15);
-            color: white;
-            transform: translateX(5px);
-
-            &::before {
-              width: 100%;
-            }
-
-            .icon {
-              transform: scale(1.2) rotate(5deg);
-            }
           }
 
           &.active {
@@ -274,9 +288,16 @@
       transition: all 0.3s ease;
       cursor: pointer;
 
-      &:hover {
+      &:hover,
+      &:focus {
         background: rgba(255, 255, 255, 0.2);
         transform: translateY(-2px);
+        outline: 2px solid rgba(255, 255, 255, 0.5);
+        outline-offset: 2px;
+      }
+
+      &:focus-visible {
+        outline: 2px solid rgba(255, 255, 255, 0.8);
       }
 
       .avatar {
@@ -312,24 +333,36 @@
   }
 }
 
+// Always visible on desktop with no close button
+@media (min-width: 769px) {
+  .sidebar-container {
+    transform: translateX(0) !important; // Always visible on desktop
+    transition: none; // No slide on desktop
+
+    .close-btn {
+      display: none;
+    }
+  }
+}
+
 // Mobile responsiveness
 @media (max-width: 768px) {
   .sidebar-container {
     width: 100%;
     transform: translateX(-100%);
-    transition: transform 0.3s ease;
+    transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 
     &.open {
       transform: translateX(0);
     }
 
     .close-btn {
-      display: flex !important;
+      display: flex;
     }
   }
 }
 
-// Smooth transitions
+// Smooth transitions and accessibility
 * {
   -webkit-tap-highlight-color: transparent;
 }
@@ -338,4 +371,24 @@ button {
   -webkit-touch-callout: none;
   -webkit-user-select: none;
   user-select: none;
+}
+
+// High contrast mode support (optional production enhancement)
+@media (prefers-contrast: high) {
+  .sidebar-container {
+    border-right: 2px solid #fff;
+  }
+
+  button.active {
+    border: 2px solid #fff;
+  }
+}
+
+// Reduced motion for accessibility
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

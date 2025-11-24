@@ -1,7 +1,11 @@
 <div class="sidebar-container" [class.open]="isOpen">
   
   <!-- Close button for mobile -->
-  <button class="close-btn" (click)="closeSidebar()">
+  <button 
+    class="close-btn" 
+    (click)="closeSidebar()"
+    aria-label="Close sidebar"
+  >
     ✖
   </button>
 
@@ -17,14 +21,16 @@
   </div>
 
   <!-- Navigation Menu -->
-  <nav>
+  <nav role="navigation" aria-label="Main navigation">
     <ul>
-      <li *ngFor="let item of menuItems">
+      <li *ngFor="let item of menuItems; trackBy: trackByFn">
         <button
           (click)="navigateTo(item.route)"
           [class.active]="isActive(item.route)"
+          [attr.aria-label]="'Navigate to ' + item.label"
+          [attr.aria-current]="isActive(item.route) ? 'page' : null"
         >
-          <span class="icon">{{item.icon}}</span>
+          <span class="icon" [attr.aria-hidden]="true">{{item.icon}}</span>
           <span class="label">{{item.label}}</span>
         </button>
       </li>

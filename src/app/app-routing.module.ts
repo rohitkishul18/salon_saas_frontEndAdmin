@@ -17,7 +17,7 @@ import { ForgetPasswordComponent } from './pages/auth/forget-password/forget-pas
 const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
-  { path: 'register', component: RegisterComponent }, // optional if needed
+  { path: 'register', component: RegisterComponent }, 
   {path:'forgot-password',component:ForgetPasswordComponent},
 
   // Superadmin Routes
