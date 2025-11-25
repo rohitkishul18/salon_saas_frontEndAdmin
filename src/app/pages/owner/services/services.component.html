@@ -15,13 +15,6 @@
         <h2 class="dashboard-title">Salon Services</h2>
         <p class="dashboard-subtitle">Manage your salon services and pricing</p>
       </div>
-      <button 
-        (click)="openModal(false)" 
-        class="add-btn"
-      >
-        <span class="icon">➕</span>
-        <span>Add Service</span>
-      </button>
     </div>
 
     <!-- Loading State -->
@@ -112,7 +105,10 @@
               </td>
 
               <td>
-                <span class="duration-text">{{ item.durationMinutes }} mins</span>
+                <div class="duration-display">
+                  <span class="duration-text">{{ getFormattedDuration(item.durationMinutes) }}</span>
+                  <span class="duration-minutes">({{ item.durationMinutes }} mins)</span>
+                </div>
               </td>
 
               <td>
@@ -190,7 +186,7 @@
     <div class="modal-content" (click)="$event.stopPropagation()">
       <div class="modal-header">
         <h3 class="modal-title">
-          {{ isEditing ? 'Edit Service' : 'Add Service' }}
+          {{ isEditing ? 'Edit Service' : 'Add New Service' }}
         </h3>
         <button class="close-btn" (click)="closeModal()">
           <span>×</span>
@@ -199,50 +195,87 @@
 
       <div class="modal-body">
         <form (ngSubmit)="saveService()" #serviceForm="ngForm">
+          
+          <!-- Service Name -->
           <div class="form-group">
-            <label class="form-label">Service Name</label>
+            <label class="form-label">
+              <span class="label-icon">✂️</span>
+              Service Name
+            </label>
             <input 
               type="text" 
               [(ngModel)]="form.name" 
               name="name"
               class="form-input"
-              placeholder="Enter service name"
+              placeholder="e.g., Women's Haircut, Hair Coloring, Manicure"
               required
             />
+            <small class="help-text">Enter the name of the service you offer</small>
           </div>
 
+          <!-- Duration -->
           <div class="form-group">
-            <label class="form-label">Duration (minutes)</label>
+            <label class="form-label">
+              <span class="label-icon">⏱️</span>
+              Service Duration
+            </label>
             <input 
               type="number" 
               [(ngModel)]="form.durationMinutes" 
               name="durationMinutes"
               class="form-input"
-              placeholder="Enter duration in minutes"
+              placeholder="Enter duration in minutes (e.g., 30, 60, 90)"
               required
               min="1"
+              max="480"
             />
+            
+            <!-- Duration Display -->
+            <div class="duration-info-box" *ngIf="form.durationMinutes > 0">
+              <div class="duration-badge">
+                <span class="badge-icon">🕐</span>
+                <span class="badge-text">{{ getFormattedDuration(form.durationMinutes) }}</span>
+              </div>
+              <p class="duration-helper">{{ getDurationHelperText(form.durationMinutes) }}</p>
+            </div>
+            
+            <small class="help-text" *ngIf="!form.durationMinutes || form.durationMinutes <= 0">
+              How long does this service typically take?
+            </small>
           </div>
 
+          <!-- Price -->
           <div class="form-group">
-            <label class="form-label">Price (₹)</label>
-            <input 
-              type="number" 
-              [(ngModel)]="form.price" 
-              name="price"
-              class="form-input"
-              placeholder="Enter price"
-              required
-              min="0"
-            />
+            <label class="form-label">
+              <span class="label-icon">💰</span>
+              Service Price
+            </label>
+            <div class="price-input-wrapper">
+              <span class="currency-symbol">₹</span>
+              <input 
+                type="number" 
+                [(ngModel)]="form.price" 
+                name="price"
+                class="form-input price-input"
+                placeholder="Enter price (e.g., 500, 1500)"
+                required
+                min="0"
+              />
+            </div>
+            <small class="help-text">Set the price customers will pay for this service</small>
           </div>
 
+          <!-- Locations -->
           <div class="form-group">
-            <label class="form-label">Select Branches (Locations)</label>
+            <label class="form-label">
+              <span class="label-icon">📍</span>
+              Available at Branches
+            </label>
             
             <!-- Selected Locations Chips -->
             <div class="selected-chips" *ngIf="selectedLocations.length > 0">
               <div class="location-chip" *ngFor="let loc of selectedLocations">
+                <span class="chip-icon">📍</span>
                 <span class="chip-text">{{ loc.name }}</span>
                 <button 
                   type="button" 
@@ -261,22 +294,25 @@
               (change)="addLocation($event)"
               [value]="''"
             >
-              <option value="" disabled>Choose a location to add...</option>
+              <option value="" disabled>
+                {{ availableLocations.length > 0 ? '➕ Click to add another branch...' : '✓ All branches selected' }}
+              </option>
               <option 
                 *ngFor="let loc of availableLocations" 
                 [value]="loc._id"
               >
-                {{ loc.name }}
+                📍 {{ loc.name }}
               </option>
             </select>
 
             <small class="help-text" *ngIf="selectedLocations.length === 0">
-              Please select at least one location
+              ⚠️ Please select at least one branch where this service is available
             </small>
             <small class="help-text success" *ngIf="selectedLocations.length > 0">
-              {{ selectedLocations.length }} location{{ selectedLocations.length !== 1 ? 's' : '' }} selected
+              ✓ Service available at {{ selectedLocations.length }} branch{{ selectedLocations.length !== 1 ? 'es' : '' }}
             </small>
           </div>
+
         </form>
       </div>
 
@@ -293,6 +329,7 @@
           class="btn btn-primary"
           [disabled]="!form.name || !form.durationMinutes || !form.price || selectedLocations.length === 0"
         >
+          <span class="btn-icon">{{ isEditing ? '✓' : '➕' }}</span>
           {{ isEditing ? 'Update Service' : 'Add Service' }}
         </button>
       </div>
@@ -334,16 +371,23 @@
     class="modal-overlay"
     (click)="closeDeleteModal()"
   >
-    <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-content delete-modal" (click)="$event.stopPropagation()">
       <div class="modal-header">
-        <h3 class="modal-title">Confirm Delete</h3>
+        <h3 class="modal-title">
+          <span class="warning-icon">⚠️</span>
+          Confirm Delete
+        </h3>
         <button class="close-btn" (click)="closeDeleteModal()">
           <span>×</span>
         </button>
       </div>
 
       <div class="modal-body">
-        <p>Are you sure you want to delete service "<strong>{{ selectedService?.name }}</strong>"? This service permanately deleted.</p>
+        <p>Are you sure you want to delete the service "<strong>{{ selectedService?.name }}</strong>"?</p>
+        <div class="warning-box">
+          <span class="warning-icon-sm">🗑️</span>
+          <span>This action cannot be undone. The service will be permanently deleted.</span>
+        </div>
       </div>
 
       <div class="modal-footer">
@@ -357,7 +401,8 @@
           (click)="confirmDelete()" 
           class="btn btn-danger"
         >
-          Delete
+          <span class="btn-icon">🗑️</span>
+          Delete Service
         </button>
       </div>
     </div>

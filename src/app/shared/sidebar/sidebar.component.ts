@@ -34,7 +34,7 @@ export class SidebarComponent implements OnInit {
       default:
         this.menuItems = [
           { label: 'Dashboard', icon: '📊', route: '/salon-owner/dashboard' },
-          { label: 'Locations', icon: '📍', route: '/salon-owner/locations' },
+          { label: 'Branches', icon: '📍', route: '/salon-owner/locations' },
           { label: 'Bookings', icon: '📅', route: '/salon-owner/booking' },
           { label: 'Services', icon: '💇‍♂️', route: '/salon-owner/services' },
         ];

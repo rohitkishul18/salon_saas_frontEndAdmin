@@ -1,36 +1,43 @@
 <nav class="navbar-container">
-
   <!-- Shimmer overlay for animation -->
   <div class="shimmer-overlay"></div>
 
   <div class="navbar-content">
-    <!-- Logo section (optional, can be hidden on mobile) -->
-    <div class="logo-section">
-      <div class="logo-icon">
-        💇
+    <!-- Empty left section for spacing -->
+    <div class="navbar-spacer"></div>
+
+    <!-- User info section -->
+    <div class="user-section" *ngIf="!isLoading">
+      <!-- Welcome message -->
+      <div class="welcome-message">
+        <span class="greeting">{{ getGreeting() }},</span>
+        <span class="user-name">{{ userName }}</span>
       </div>
-      <h1>
-        <span class="highlight">Salon</span> SaaS
-      </h1>
-      <p>Manage with Style</p>
+
+      <!-- User actions -->
+      <div class="user-actions">
+        <!-- User Role Badge -->
+        <div class="role-badge">
+          <span class="role-icon">👤</span>
+          <span class="role-text">{{ getRoleDisplayName() }}</span>
+        </div>
+
+        <!-- Logout Button -->
+        <button 
+          class="logout-btn"
+          (click)="logout()"
+          aria-label="Logout"
+        >
+          <span class="icon">🚪</span>
+          <span class="label">Logout</span>
+        </button>
+      </div>
     </div>
 
-    <!-- User actions -->
-    <div class="user-actions">
-      <!-- User Role -->
-      <span class="role-badge">
-        {{ role | titlecase }} Role
-      </span>
-
-      <!-- Logout -->
-      <button 
-        class="logout-btn"
-        (click)="logout()"
-      >
-        <span class="icon">🚪</span>
-        <span class="label">Logout</span>
-      </button>
+    <!-- Loading state -->
+    <div class="user-section loading" *ngIf="isLoading">
+      <div class="skeleton-text"></div>
+      <div class="skeleton-badge"></div>
     </div>
   </div>
-
 </nav>

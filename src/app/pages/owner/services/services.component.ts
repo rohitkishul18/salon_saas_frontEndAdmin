@@ -11,8 +11,8 @@ export class ServicesComponent implements OnInit {
 
   services: any[] = [];
   locations: any[] = [];
-  selectedLocations: any[] = [];  // Locations selected in the form
-  availableLocations: any[] = [];  // Locations not yet selected
+  selectedLocations: any[] = [];
+  availableLocations: any[] = [];
   loading = false;
   locationLoading = false;
 
@@ -55,6 +55,41 @@ export class ServicesComponent implements OnInit {
   }
 
   /**
+   * Get formatted duration display (e.g., "1 hour 30 minutes" or "45 minutes")
+   */
+  getFormattedDuration(minutes: number): string {
+    if (!minutes || minutes <= 0) return '';
+    
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    
+    if (hours === 0) {
+      return `${mins} minute${mins !== 1 ? 's' : ''}`;
+    } else if (mins === 0) {
+      return `${hours} hour${hours !== 1 ? 's' : ''}`;
+    } else {
+      return `${hours} hour${hours !== 1 ? 's' : ''} ${mins} minute${mins !== 1 ? 's' : ''}`;
+    }
+  }
+
+  /**
+   * Get duration helper text with emoji
+   */
+  getDurationHelperText(minutes: number): string {
+    if (!minutes || minutes <= 0) return '⏱️ Enter service duration';
+    
+    if (minutes < 30) {
+      return '⚡ Quick service - Perfect for touch-ups';
+    } else if (minutes >= 30 && minutes < 60) {
+      return '⏰ Standard service duration';
+    } else if (minutes >= 60 && minutes < 120) {
+      return '🕐 Extended service - Reserve enough time';
+    } else {
+      return '📅 Long service - Multiple hours required';
+    }
+  }
+
+  /**
    * Load all locations for the salon
    */
   loadLocations() {
@@ -94,7 +129,6 @@ export class ServicesComponent implements OnInit {
       this.updateFormLocationIds();
     }
 
-    // Reset dropdown
     event.target.value = '';
   }
 
@@ -190,14 +224,11 @@ export class ServicesComponent implements OnInit {
         locationIds: []
       };
 
-      // Populate selectedLocations from existing service data
       if (data.locationIds && Array.isArray(data.locationIds)) {
         this.selectedLocations = data.locationIds.map((loc: any) => {
-          // If loc is already an object with _id and name
           if (typeof loc === 'object' && loc._id) {
             return loc;
           }
-          // If loc is just an ID string, find the full location object
           return this.locations.find(l => l._id === loc) || { _id: loc, name: 'Unknown' };
         });
       } else {
@@ -207,7 +238,6 @@ export class ServicesComponent implements OnInit {
       this.updateFormLocationIds();
       this.updateAvailableLocations();
     } else {
-      // New service
       this.form = {
         id: null,
         name: '',
@@ -304,9 +334,7 @@ export class ServicesComponent implements OnInit {
       return;
     }
 
-    // Ensure locationIds are up to date
     this.updateFormLocationIds();
-
     this.isEditing ? this.updateService() : this.addService();
   }
 
@@ -331,5 +359,4 @@ export class ServicesComponent implements OnInit {
       error: () => this.showNotification('Error', 'Failed to update service')
     });
   }
-
 }

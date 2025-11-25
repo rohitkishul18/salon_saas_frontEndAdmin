@@ -10,18 +10,41 @@
 }
 
 @keyframes pulse {
-  0%, 100% { transform: scale(1); opacity: 0.8; }
-  50% { transform: scale(1.05); opacity: 1; }
+  0%, 100% { 
+    transform: scale(1); 
+    opacity: 0.8; 
+  }
+  50% { 
+    transform: scale(1.05); 
+    opacity: 1; 
+  }
 }
 
 @keyframes shimmer {
-  0% { background-position: -200% center; }
-  100% { background-position: 200% center; }
+  0% { 
+    background-position: -200% center; 
+  }
+  100% { 
+    background-position: 200% center; 
+  }
 }
 
 @keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-2px); }
+  0%, 100% { 
+    transform: translateY(0); 
+  }
+  50% { 
+    transform: translateY(-2px); 
+  }
+}
+
+@keyframes skeletonLoading {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
 }
 
 .navbar-container {
@@ -39,7 +62,7 @@
   align-items: center;
   overflow: hidden;
 
-  // Animated overlay effect (matching sidebar)
+  // Animated overlay effect
   &::before {
     content: '';
     position: absolute;
@@ -58,7 +81,6 @@
     pointer-events: none;
   }
 
-  // Shimmer overlay (duplicate for layering)
   .shimmer-overlay {
     position: absolute;
     top: 0;
@@ -79,82 +101,109 @@
   .navbar-content {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: flex-end; // Align user section to the right
     width: 100%;
-    padding: 0 1.5rem;
+    // max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 2rem;
     position: relative;
     z-index: 1;
   }
 
-  // Logo section (scaled down to fit navbar)
-  .logo-section {
+  // Spacer for left side
+  .navbar-spacer {
+    flex: 1;
+  }
+
+  // User section
+  .user-section {
     display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    text-align: left;
+    align-items: flex-end;
+    gap: 1.5rem;
 
-    .logo-icon {
-      width: 40px;
-      height: 40px;
-      background: rgba(255, 255, 255, 0.2);
-      backdrop-filter: blur(10px);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.2rem;
-      animation: pulse 3s infinite;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-      flex-shrink: 0;
-    }
+    &.loading {
+      .skeleton-text {
+        width: 180px;
+        height: 36px;
+        background: linear-gradient(
+          90deg,
+          rgba(255, 255, 255, 0.1) 25%,
+          rgba(255, 255, 255, 0.2) 50%,
+          rgba(255, 255, 255, 0.1) 75%
+        );
+        background-size: 200% 100%;
+        animation: skeletonLoading 1.5s infinite;
+        border-radius: 8px;
+      }
 
-    h1 {
-      font-size: 1.2rem;
-      font-weight: 700;
-      color: white;
-      margin: 0;
-      letter-spacing: 0.25px;
-      display: flex;
-      flex-direction: column;
-      line-height: 1.1;
-
-      .highlight {
-        background: linear-gradient(135deg, #fff 0%, #f0f0f0 100%);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        background-clip: text;
-        font-weight: 800;
+      .skeleton-badge {
+        width: 120px;
+        height: 38px;
+        background: linear-gradient(
+          90deg,
+          rgba(255, 255, 255, 0.1) 25%,
+          rgba(255, 255, 255, 0.2) 50%,
+          rgba(255, 255, 255, 0.1) 75%
+        );
+        background-size: 200% 100%;
+        animation: skeletonLoading 1.5s infinite;
+        border-radius: 20px;
       }
     }
+  }
 
-    p {
-      color: rgba(255, 255, 255, 0.8);
-      font-size: 0.65rem;
-      margin: 0;
+  // Welcome message
+  .welcome-message {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 2px;
+    margin-right: 1rem;
+    animation: float 3s ease-in-out infinite;
+
+    .greeting {
+      color: rgba(255, 255, 255, 0.9);
+      font-size: 0.8rem;
       font-weight: 500;
+      letter-spacing: 0.3px;
+    }
+
+    .user-name {
+      color: white;
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
   }
 
   // User actions
   .user-actions {
     display: flex;
-    align-items: center;
+    align-items: end;
     gap: 1rem;
-    animation: float 3s ease-in-out infinite;
 
     .role-badge {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
       background: rgba(255, 255, 255, 0.2);
       backdrop-filter: blur(10px);
       color: white;
-      padding: 0.5rem 1rem;
-      border-radius: 20px;
-      font-size: 0.85rem;
-      font-weight: 500;
-      letter-spacing: 0.5px;
+      padding: 0.625rem 1.125rem;
+      border-radius: 24px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      letter-spacing: 0.3px;
       border: 1px solid rgba(255, 255, 255, 0.3);
       transition: all 0.3s ease;
       position: relative;
       overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+      .role-icon {
+        font-size: 1rem;
+      }
 
       &::before {
         content: '';
@@ -169,7 +218,8 @@
 
       &:hover {
         background: rgba(255, 255, 255, 0.3);
-        transform: translateY(-1px);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 
         &::before {
           width: 100%;
@@ -186,15 +236,15 @@
       border: none;
       background: rgba(255, 255, 255, 0.15);
       color: white;
-      font-size: 0.9rem;
-      font-weight: 500;
+      font-size: 0.95rem;
+      font-weight: 600;
       cursor: pointer;
       transition: all 0.3s ease;
-      text-align: left;
       position: relative;
       overflow: hidden;
       backdrop-filter: blur(10px);
       border: 1px solid rgba(255, 255, 255, 0.2);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 
       &::before {
         content: '';
@@ -208,8 +258,10 @@
       }
 
       .icon {
-        font-size: 1.1rem;
+        font-size: 1.15rem;
         transition: transform 0.3s ease;
+        position: relative;
+        z-index: 1;
       }
 
       .label {
@@ -220,14 +272,15 @@
       &:hover {
         background: rgba(255, 255, 255, 0.25);
         color: white;
-        transform: translateX(3px) scale(1.02);
+        transform: translateX(3px) scale(1.03);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 
         &::before {
           width: 100%;
         }
 
         .icon {
-          transform: scale(1.1) rotate(5deg);
+          transform: scale(1.15) rotate(5deg);
         }
       }
 
@@ -238,47 +291,101 @@
   }
 }
 
-// Mobile responsiveness (hide logo on small screens, adjust padding)
-@media (max-width: 768px) {
+// Responsive design
+@media (max-width: 1024px) {
   .navbar-container {
-    height: 70px;
-    padding: 0 1rem;
-  }
+    .navbar-content {
+      padding: 0 1.5rem;
+    }
 
-  .navbar-content {
-    padding: 0 1rem;
-  }
+    .welcome-message {
+      margin-right: 0.75rem;
 
-  .logo-section {
-    h1 {
-      font-size: 1rem;
-
-      p {
-        display: none;
+      .greeting {
+        font-size: 0.75rem;
       }
-    }
-  }
 
-  .user-actions {
-    gap: 0.5rem;
-
-    .role-badge {
-      padding: 0.4rem 0.8rem;
-      font-size: 0.8rem;
-    }
-
-    .logout-btn {
-      padding: 0.6rem 1rem;
-      font-size: 0.85rem;
-
-      .icon {
+      .user-name {
         font-size: 1rem;
       }
     }
   }
 }
 
-// Smooth interactions (matching sidebar)
+@media (max-width: 768px) {
+  .navbar-container {
+    height: 70px;
+
+    .navbar-content {
+      padding: 0 1rem;
+      justify-content: flex-end;
+    }
+
+    .navbar-spacer {
+      display: none;
+    }
+
+    .user-section {
+      gap: 0.75rem;
+    }
+
+    .welcome-message {
+      display: none;
+    }
+
+    .user-actions {
+      gap: 0.625rem;
+
+      .role-badge {
+        padding: 0.5rem 0.875rem;
+        font-size: 0.8rem;
+
+        .role-icon {
+          font-size: 0.9rem;
+        }
+
+        .role-text {
+          display: none;
+        }
+      }
+
+      .logout-btn {
+        padding: 0.625rem 1rem;
+        font-size: 0.85rem;
+
+        .icon {
+          font-size: 1rem;
+        }
+
+        .label {
+          display: none;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar-container {
+    height: 64px;
+
+    .navbar-content {
+      padding: 0 0.75rem;
+    }
+
+    .user-actions {
+      .role-badge {
+        padding: 0.5rem;
+      }
+
+      .logout-btn {
+        padding: 0.5rem 0.875rem;
+      }
+    }
+  }
+}
+
+// Smooth interactions
 * {
   -webkit-tap-highlight-color: transparent;
 }
