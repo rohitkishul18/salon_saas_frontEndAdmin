@@ -85,7 +85,7 @@
               <th>
                 <span class="th-content">
                   <span class="th-icon">📍</span>
-                  Location
+                  Locations
                 </span>
               </th>
               <th>
@@ -120,7 +120,7 @@
               </td>
 
               <td>
-                <span class="location-text">{{ item.locationId?.name || '-' }}</span>
+                <span class="location-text">{{ getLocationNames(item) }}</span>
               </td>
 
               <td>
@@ -134,7 +134,7 @@
                   </button>
                   <button 
                     class="action-btn delete-btn"
-                    (click)="deleteService(item)"
+                    (click)="openDeleteModal(item)"
                   >
                     <span class="icon">🗑️</span>
                     <span>Delete</span>
@@ -181,7 +181,7 @@
 
   </div>
 
-  <!-- Modal -->
+  <!-- Add/Edit Modal -->
   <div 
     *ngIf="showModal" 
     class="modal-overlay"
@@ -238,16 +238,44 @@
           </div>
 
           <div class="form-group">
-            <label class="form-label">Location ID</label>
-            <input 
-              type="text"
-              readonly 
-              [(ngModel)]="form.locationId" 
-              name="locationId"
-              class="form-input"
-              placeholder="Enter location ID"
-              required
-            />
+            <label class="form-label">Select Branches (Locations)</label>
+            
+            <!-- Selected Locations Chips -->
+            <div class="selected-chips" *ngIf="selectedLocations.length > 0">
+              <div class="location-chip" *ngFor="let loc of selectedLocations">
+                <span class="chip-text">{{ loc.name }}</span>
+                <button 
+                  type="button" 
+                  class="chip-remove" 
+                  (click)="removeLocation(loc._id)"
+                  title="Remove location"
+                >
+                  ×
+                </button>
+              </div>
+            </div>
+
+            <!-- Dropdown for Available Locations -->
+            <select 
+              class="form-input location-select"
+              (change)="addLocation($event)"
+              [value]="''"
+            >
+              <option value="" disabled>Choose a location to add...</option>
+              <option 
+                *ngFor="let loc of availableLocations" 
+                [value]="loc._id"
+              >
+                {{ loc.name }}
+              </option>
+            </select>
+
+            <small class="help-text" *ngIf="selectedLocations.length === 0">
+              Please select at least one location
+            </small>
+            <small class="help-text success" *ngIf="selectedLocations.length > 0">
+              {{ selectedLocations.length }} location{{ selectedLocations.length !== 1 ? 's' : '' }} selected
+            </small>
           </div>
         </form>
       </div>
@@ -263,9 +291,73 @@
         <button 
           (click)="saveService()" 
           class="btn btn-primary"
-          [disabled]="!form.name || !form.durationMinutes || !form.price || !form.locationId"
+          [disabled]="!form.name || !form.durationMinutes || !form.price || selectedLocations.length === 0"
         >
           {{ isEditing ? 'Update Service' : 'Add Service' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notification Modal -->
+  <div 
+    *ngIf="showNotificationModal" 
+    class="modal-overlay"
+    (click)="closeNotification()"
+  >
+    <div class="modal-content notification-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3 class="modal-title">{{ notification.title }}</h3>
+        <button class="close-btn" (click)="closeNotification()">
+          <span>×</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <p>{{ notification.message }}</p>
+      </div>
+
+      <div class="modal-footer">
+        <button 
+          (click)="closeNotification()" 
+          class="btn btn-primary"
+        >
+          OK
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div 
+    *ngIf="showDeleteModal" 
+    class="modal-overlay"
+    (click)="closeDeleteModal()"
+  >
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3 class="modal-title">Confirm Delete</h3>
+        <button class="close-btn" (click)="closeDeleteModal()">
+          <span>×</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <p>Are you sure you want to delete service "<strong>{{ selectedService?.name }}</strong>"? This service permanately deleted.</p>
+      </div>
+
+      <div class="modal-footer">
+        <button 
+          (click)="closeDeleteModal()" 
+          class="btn btn-secondary"
+        >
+          Cancel
+        </button>
+        <button 
+          (click)="confirmDelete()" 
+          class="btn btn-danger"
+        >
+          Delete
         </button>
       </div>
     </div>

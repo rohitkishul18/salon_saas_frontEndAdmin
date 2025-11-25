@@ -22,6 +22,8 @@ export class BookingComponent implements OnInit {
   showStatusModal = false;
   currentBooking: any = null;
   newStatus: string = '';
+  showDeleteModal = false;
+  selectedBooking: any = null;
 
   // Error handling
   errorMessage: string = '';
@@ -190,17 +192,31 @@ export class BookingComponent implements OnInit {
   }
 
   /**
-   * Delete booking
+   * Open delete confirmation modal
    */
-  deleteBooking(booking: any) {
-    if (!confirm(`Are you sure you want to delete booking for ${booking.customerName}?`)) {
-      return;
-    }
+  openDeleteModal(booking: any) {
+    this.selectedBooking = booking;
+    this.showDeleteModal = true;
+  }
+
+  /**
+   * Close delete modal
+   */
+  closeDeleteModal() {
+    this.showDeleteModal = false;
+    this.selectedBooking = null;
+  }
+
+  /**
+   * Confirm and delete booking
+   */
+  confirmDelete() {
+    if (!this.selectedBooking) return;
 
     this.loading = true;
     this.errorMessage = '';
 
-    this.bookingService.deleteBooking(booking._id).subscribe({
+    this.bookingService.deleteBooking(this.selectedBooking._id).subscribe({
       next: () => {
         // Reload current page or go to previous page if current page becomes empty
         const remainingItems = this.totalItems - 1;
@@ -211,10 +227,12 @@ export class BookingComponent implements OnInit {
         } else {
           this.loadBookings(this.currentPage, this.itemsPerPage);
         }
+        this.closeDeleteModal();
       },
       error: (err) => {
         this.loading = false;
         this.errorMessage = this.getErrorMessage(err, 'Failed to delete booking');
+        this.closeDeleteModal();
       }
     });
   }

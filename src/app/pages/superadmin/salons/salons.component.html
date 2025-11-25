@@ -1,13 +1,11 @@
 <div class="salons-wrapper">
-  
+ 
   <!-- Background Decoration -->
   <div class="background-shapes">
     <span class="shape shape-1"></span>
     <span class="shape shape-2"></span>
   </div>
-
   <div class="salons-container">
-
     <!-- Page Header -->
     <div class="page-header">
       <div class="header-content">
@@ -19,13 +17,12 @@
           <span class="btn-icon" [class.spinning]="loading">🔄</span>
           <span>Refresh</span>
         </button>
-        <button class="action-btn primary">
+        <button class="action-btn primary" routerLink="/register">
           <span class="btn-icon">➕</span>
           <span>Add Salon</span>
         </button>
       </div>
     </div>
-
     <!-- Stats Overview -->
     <div class="stats-overview">
       <div class="stat-item">
@@ -50,49 +47,45 @@
         </div>
       </div>
     </div>
-
     <!-- Main Table Section -->
     <div class="table-section">
-
       <!-- Search & Filter Bar -->
       <div class="toolbar">
         <div class="search-box">
           <span class="search-icon">🔍</span>
-          <input 
-            type="text" 
+          <input
+            type="text"
             placeholder="Search salons by name, email, or phone..."
             [(ngModel)]="searchTerm"
             (input)="filterSalons()"
           />
         </div>
         <div class="filter-group">
-          <button 
-            class="filter-btn" 
+          <button
+            class="filter-btn"
             [class.active]="filterStatus === 'all'"
             (click)="setFilter('all')">
             All
           </button>
-          <button 
-            class="filter-btn" 
+          <button
+            class="filter-btn"
             [class.active]="filterStatus === 'active'"
             (click)="setFilter('active')">
             Active
           </button>
-          <button 
-            class="filter-btn" 
+          <button
+            class="filter-btn"
             [class.active]="filterStatus === 'inactive'"
             (click)="setFilter('inactive')">
             Inactive
           </button>
         </div>
       </div>
-
       <!-- Loading State -->
       <div *ngIf="loading" class="loading-state">
         <div class="spinner"></div>
         <p>Loading salons data...</p>
       </div>
-
       <!-- Empty State -->
       <div *ngIf="!loading && filteredSalons.length === 0" class="empty-state">
         <div class="empty-icon">🏪</div>
@@ -100,7 +93,6 @@
         <p *ngIf="searchTerm">Try adjusting your search criteria</p>
         <p *ngIf="!searchTerm">No salons registered in the system yet</p>
       </div>
-
       <!-- Salons Table -->
       <div *ngIf="!loading && filteredSalons.length > 0" class="table-wrapper">
         <table class="modern-table">
@@ -150,12 +142,11 @@
               </th>
             </tr>
           </thead>
-
           <tbody>
-            <tr *ngFor="let salon of filteredSalons; let i = index" 
+            <tr *ngFor="let salon of filteredSalons; let i = index"
                 class="table-row"
                 [style.animation-delay]="(i * 0.05) + 's'">
-              
+             
               <!-- Salon Name with Avatar -->
               <td>
                 <div class="salon-info">
@@ -165,51 +156,45 @@
                   <span class="salon-name">{{ salon.name }}</span>
                 </div>
               </td>
-
               <!-- Owner Name -->
               <td>
                 <span class="owner-name">{{ salon.ownerName }}</span>
               </td>
-
               <!-- Email -->
               <td>
                 <div class="contact-info">
                   <span class="contact-text">{{ salon.email }}</span>
                 </div>
               </td>
-
               <!-- Phone -->
               <td>
                 <div class="contact-info">
                   <span class="contact-text">{{ salon.phone }}</span>
                 </div>
               </td>
-
               <!-- Status Badge -->
               <td>
-                <span 
-                  class="status-badge" 
-                  [class.active]="salon.ownerActive" 
+                <span
+                  class="status-badge"
+                  [class.active]="salon.ownerActive"
                   [class.inactive]="!salon.ownerActive">
                   <span class="status-dot"></span>
                   {{ salon.ownerActive ? 'Active' : 'Inactive' }}
                 </span>
               </td>
-
               <!-- Created Date -->
               <td>
                 <span class="date-text">
                   {{ salon.createdAt | date: 'MMM d, y' }}
                 </span>
               </td>
-
               <!-- Action Button -->
               <td>
                 <button
                   class="action-toggle-btn"
                   [class.deactivate]="salon.ownerActive"
                   [class.activate]="!salon.ownerActive"
-                  (click)="toggleStatus(salon)"
+                  (click)="openToggleConfirm(salon)"
                   [disabled]="salon.isUpdating">
                   <span class="btn-icon" *ngIf="!salon.isUpdating">
                     {{ salon.ownerActive ? '🔴' : '✅' }}
@@ -218,20 +203,56 @@
                   <span>{{ salon.ownerActive ? 'Deactivate' : 'Activate' }}</span>
                 </button>
               </td>
-
             </tr>
           </tbody>
         </table>
       </div>
-
       <!-- Pagination (Optional) -->
       <div class="table-footer" *ngIf="!loading && filteredSalons.length > 0">
         <p class="results-info">
           Showing <strong>{{ filteredSalons.length }}</strong> of <strong>{{ salons.length }}</strong> salons
         </p>
       </div>
-
     </div>
+  </div>
 
+  <!-- Confirmation Modal -->
+  <div class="modal-overlay" *ngIf="showConfirmModal" (click)="closeConfirmModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <span class="modal-icon" [innerHTML]="getConfirmIcon()"></span>
+        <h3>{{ getConfirmTitle() }}</h3>
+      </div>
+      <div class="modal-body">
+        <p [innerHTML]="getConfirmMessage()"></p>
+      </div>
+      <div class="modal-footer">
+        <button class="modal-btn cancel" (click)="closeConfirmModal()">Cancel</button>
+        <button 
+          class="modal-btn confirm" 
+          [class.danger]="confirmAction === 'deactivate'"
+          (click)="confirmToggle()">
+          {{ confirmAction === 'deactivate' ? 'Deactivate' : 'Activate' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notification Modal -->
+  <div class="modal-overlay" *ngIf="showNotificationModal" (click)="closeNotificationModal()">
+    <div class="modal-content notification-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <span class="modal-icon" [class.success]="notificationType === 'success'" [class.error]="notificationType === 'error'">
+          {{ notificationType === 'success' ? '✅' : '❌' }}
+        </span>
+        <h3>{{ notificationType === 'success' ? 'Success' : 'Error' }}</h3>
+      </div>
+      <div class="modal-body">
+        <p>{{ notificationMessage }}</p>
+      </div>
+      <div class="modal-footer">
+        <button class="modal-btn cancel" (click)="closeNotificationModal()">Close</button>
+      </div>
+    </div>
   </div>
 </div>

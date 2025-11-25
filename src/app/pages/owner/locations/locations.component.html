@@ -67,7 +67,7 @@
               <th>
                 <span class="th-content">
                   <span class="th-icon">📍</span>
-                  Location Name
+                  Branch Name
                 </span>
               </th>
               <th>
@@ -181,7 +181,7 @@
 
   </div>
 
-  <!-- Modal -->
+  <!-- Add/Edit Modal -->
   <div 
     *ngIf="showModal" 
     class="modal-overlay"
@@ -200,13 +200,13 @@
       <div class="modal-body">
         <form (ngSubmit)="saveLocation()" #locationForm="ngForm" class="space-y-4">
           <div class="form-group">
-            <label class="form-label">Location Name</label>
+            <label class="form-label">Branch Name</label>
             <input 
               type="text" 
               [(ngModel)]="form.name" 
               name="name"
               class="form-input"
-              placeholder="Enter location name"
+              placeholder="Enter Branch Name"
               required
             />
           </div>
@@ -273,6 +273,50 @@
           [disabled]="!form.name || !form.address || !form.phone || !form.openingTime || !form.closingTime"
         >
           {{ isEdit ? 'Update Location' : 'Add Location' }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notification Modal -->
+  <div 
+    *ngIf="showNotificationModal" 
+    class="modal-overlay"
+    (click)="closeNotification()"
+  >
+    <div class="modal-content notification-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3 class="modal-title">{{ notification.title }}</h3>
+        <button class="close-btn" (click)="closeNotification()">
+          <span>×</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <p>{{ notification.message }}</p>
+      </div>
+
+      <div class="modal-footer">
+        <button 
+          *ngIf="notification.showConfirm" 
+          (click)="closeNotification()" 
+          class="btn btn-secondary"
+        >
+          Cancel
+        </button>
+        <button 
+          *ngIf="notification.showConfirm" 
+          (click)="notification.onConfirm(); closeNotification()" 
+          class="btn btn-danger"
+        >
+          Yes, Delete
+        </button>
+        <button 
+          *ngIf="!notification.showConfirm" 
+          (click)="closeNotification()" 
+          class="btn btn-primary"
+        >
+          OK
         </button>
       </div>
     </div>

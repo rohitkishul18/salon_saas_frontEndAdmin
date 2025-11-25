@@ -505,6 +505,10 @@
   animation: modalSlideIn 0.3s ease-out;
   position: relative;
 
+  &.notification-modal {
+    max-width: 450px;
+  }
+
   .modal-header {
     display: flex;
     justify-content: space-between;
@@ -576,6 +580,13 @@
         }
       }
     }
+
+    p {
+      margin: 0;
+      color: #374151;
+      font-size: 1rem;
+      line-height: 1.5;
+    }
   }
 
   .modal-footer {
@@ -614,6 +625,16 @@
         &:disabled {
           opacity: 0.6;
           cursor: not-allowed;
+        }
+      }
+
+      &.btn-danger {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        color: white;
+
+        &:hover {
+          transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
         }
       }
     }

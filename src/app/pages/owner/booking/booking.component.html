@@ -115,7 +115,7 @@
                   Status
                 </span>
               </th>
-              <th>
+              <th colspan="2">
                 <span class="th-content">
                   <span class="th-icon">⚙️</span>
                   Actions
@@ -196,7 +196,7 @@
                   </button>
                   <button 
                     class="action-btn delete-btn"
-                    (click)="deleteBooking(b)"
+                    (click)="openDeleteModal(b)"
                     title="Delete Booking"
                   >
                     <span class="icon">🗑️</span>
@@ -400,6 +400,41 @@
             <span class="mini-spinner"></span>
             Updating...
           </span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation Modal -->
+  <div 
+    *ngIf="showDeleteModal" 
+    class="modal-overlay"
+    (click)="closeDeleteModal()"
+  >
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3 class="modal-title">Confirm Delete</h3>
+        <button class="close-btn" (click)="closeDeleteModal()">
+          <span>×</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <p>Are you sure you want to delete booking for <strong>{{ selectedBooking?.customerName }}</strong>? This booking permanately deleted.</p>
+      </div>
+
+      <div class="modal-footer">
+        <button 
+          (click)="closeDeleteModal()" 
+          class="btn btn-secondary"
+        >
+          Cancel
+        </button>
+        <button 
+          (click)="confirmDelete()" 
+          class="btn btn-danger"
+        >
+          Delete
         </button>
       </div>
     </div>

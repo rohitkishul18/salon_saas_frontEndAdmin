@@ -122,10 +122,10 @@
       <div class="card recent-bookings-card lg:col-span-2">
         <div class="section-header">
           <h3 class="section-title">Recent Bookings</h3>
-          <button class="view-all-btn">
+          <a routerLink="/salon-owner/booking" class="view-all-btn">
             <span>View All</span>
             <span class="arrow">→</span>
-          </button>
+          </a>
         </div>
 
         <!-- Loading State -->
@@ -164,14 +164,14 @@
     </div>
 
     <!-- Salon Setup Status Section -->
-    <!-- <div class="table-section">
+    <div class="table-section">
       
       <div class="section-header">
         <div>
           <h3 class="section-title">Salon Setup Status</h3>
           <p class="section-subtitle">Complete your salon profile to unlock full features</p>
         </div>
-        <button class="view-all-btn">
+        <button class="view-all-btn" (click)="openGuide()">
           <span>Setup Guide</span>
           <span class="arrow">→</span>
         </button>
@@ -205,7 +205,39 @@
         </div>
       </div>
 
-    </div> -->
+    </div>
 
   </div>
+
+  <!-- Setup Guide Modal -->
+  <div class="modal-overlay" *ngIf="showGuideModal" (click)="closeGuide()">
+    <div class="modal-content guide-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <span class="modal-icon">🛠️</span>
+        <h3>Salon Owner Setup Guide</h3>
+      </div>
+      <div class="modal-body">
+        <p>Welcome to your salon dashboard! Follow these steps to get started and explore all features:</p>
+        <ol class="guide-steps">
+          <li>
+            <strong>Add Services:</strong> Go to <a routerLink="/salon-owner/services">Services</a> to list your offerings like haircuts, coloring, etc., with prices and durations.
+          </li>
+          <li>
+            <strong>Set Up Locations:</strong> If you have multiple branches, manage them in <a routerLink="/salon-owner/locations">Locations</a> to enable multi-location bookings.
+          </li>
+          <li>
+            <strong>Explore Bookings:</strong> View and manage appointments in <a routerLink="/salon-owner/booking">Bookings</a>. Set availability and handle cancellations.
+          </li>
+          <li>
+            <strong>Analytics & Reports:</strong> Check performance insights in <a>Analytics</a> to grow your business.
+          </li>
+        </ol>
+        <p class="guide-note">Once setup is complete, you'll unlock advanced features like online payments and customer notifications. Need help? Contact support!  👇 rohit.kishul@Gmail.com, Mobile No - 9766198212   </p>
+      </div>
+      <div class="modal-footer">
+        <button class="modal-btn cancel" (click)="closeGuide()">Got It!</button>
+      </div>
+    </div>
+  </div>
+
 </div>

@@ -16,6 +16,14 @@ export class SalonsComponent implements OnInit {
   searchTerm: string = '';
   filterStatus: 'all' | 'active' | 'inactive' = 'all';
 
+  // Modal states
+  showConfirmModal = false;
+  confirmAction: 'activate' | 'deactivate' | null = null;
+  selectedSalon: any = null;
+  showNotificationModal = false;
+  notificationMessage = '';
+  notificationType: 'success' | 'error' = 'success';
+
   constructor(private superAdminService: SuperadminService) {}
 
   ngOnInit(): void {
@@ -35,25 +43,40 @@ export class SalonsComponent implements OnInit {
       error: (err) => {
         console.error('Error loading salons:', err);
         this.loading = false;
-        this.showNotification('Failed to load salons', 'error');
+        this.showNotification('Failed to load salons. Please try refreshing the page.', 'error');
       }
     });
   }
 
-  toggleStatus(salon: any) {
+  /**
+   * Open confirmation modal for status toggle
+   */
+  openToggleConfirm(salon: any) {
+    this.selectedSalon = salon;
+    this.confirmAction = salon.ownerActive ? 'deactivate' : 'activate';
+    this.showConfirmModal = true;
+  }
+
+  /**
+   * Confirm and execute status toggle
+   */
+  confirmToggle() {
+    if (!this.selectedSalon || this.confirmAction === null) return;
+
     // Prevent multiple clicks
-    if (salon.isUpdating) return;
+    if (this.selectedSalon.isUpdating) return;
 
-    const newStatus = !salon.ownerActive;
-    salon.isUpdating = true;
+    const newStatus = this.confirmAction === 'activate';
+    this.selectedSalon.isUpdating = true;
+    this.showConfirmModal = false;
 
-    this.superAdminService.updateOwnerStatus(salon.id, newStatus).subscribe({
+    this.superAdminService.updateOwnerStatus(this.selectedSalon.id, newStatus).subscribe({
       next: () => {
-        salon.ownerActive = newStatus;
-        salon.isUpdating = false;
+        this.selectedSalon.ownerActive = newStatus;
+        this.selectedSalon.isUpdating = false;
         
         const statusText = newStatus ? 'activated' : 'deactivated';
-        this.showNotification(`Salon ${statusText} successfully`, 'success');
+        this.showNotification(`Salon "${this.selectedSalon.name}" has been ${statusText} successfully. The owner will now ${newStatus ? 'gain full access' : 'lose access'} to the system.`, 'success');
         
         // Update filtered list
         this.filterSalons();
@@ -61,10 +84,19 @@ export class SalonsComponent implements OnInit {
       
       error: (err) => {
         console.error('Error updating salon status:', err);
-        salon.isUpdating = false;
-        this.showNotification('Failed to update salon status', 'error');
+        this.selectedSalon.isUpdating = false;
+        this.showNotification('Failed to update salon status. Please try again.', 'error');
       }
     });
+  }
+
+  /**
+   * Close confirmation modal
+   */
+  closeConfirmModal() {
+    this.showConfirmModal = false;
+    this.selectedSalon = null;
+    this.confirmAction = null;
   }
 
   /**
@@ -124,16 +156,51 @@ export class SalonsComponent implements OnInit {
   }
 
   /**
-   * Show notification (replace with your toast/notification service)
+   * Show notification via modal
    */
   private showNotification(message: string, type: 'success' | 'error') {
-    // For now using alert, replace with your notification library
-    // e.g., Swal.fire, toastr, or Angular Material Snackbar
-    if (type === 'success') {
-      alert(`✅ ${message}`);
-    } else {
-      alert(`❌ ${message}`);
-    }
+    this.notificationMessage = message;
+    this.notificationType = type;
+    this.showNotificationModal = true;
+
+    // Auto-close after 4 seconds
+    setTimeout(() => {
+      this.closeNotificationModal();
+    }, 4000);
   }
 
+  /**
+   * Close notification modal
+   */
+  closeNotificationModal() {
+    this.showNotificationModal = false;
+    this.notificationMessage = '';
+    this.notificationType = 'success';
+  }
+
+  /**
+   * Get confirmation message based on action
+   */
+  getConfirmMessage(): string {
+    if (this.confirmAction === 'deactivate') {
+      return `Are you sure you want to deactivate "${this.selectedSalon?.name}"? This action will immediately revoke the owner's access to the salon management system, including booking features and analytics. The salon will appear as inactive until reactivated. This cannot be undone without manual intervention.`;
+    } else if (this.confirmAction === 'activate') {
+      return `Are you sure you want to activate "${this.selectedSalon?.name}"? This will restore full access for the owner, enabling them to manage bookings, view analytics, and operate normally. Ensure all compliance checks are complete before proceeding.`;
+    }
+    return '';
+  }
+
+  /**
+   * Get confirmation title based on action
+   */
+  getConfirmTitle(): string {
+    return this.confirmAction === 'deactivate' ? 'Deactivate Salon?' : 'Activate Salon?';
+  }
+
+  /**
+   * Get confirmation icon based on action
+   */
+  getConfirmIcon(): string {
+    return this.confirmAction === 'deactivate' ? '⚠️' : '✅';
+  }
 }

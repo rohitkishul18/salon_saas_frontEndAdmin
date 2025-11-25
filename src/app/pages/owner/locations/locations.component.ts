@@ -31,10 +31,42 @@ export class LocationsComponent implements OnInit {
 
   editId: string = '';
 
+  // Notification Modal
+  showNotificationModal = false;
+  notification: any = {
+    type: '',
+    title: '',
+    message: '',
+    showConfirm: false,
+    onConfirm: undefined
+  };
+
   constructor(private locationService: LocationService) {}
 
   ngOnInit(): void {
     this.loadLocations();
+  }
+
+  /**
+   * Show notification modal
+   */
+  showNotification(type: 'success' | 'error' | 'confirm', title: string, message: string, showConfirm = false, onConfirm?: () => void) {
+    this.notification = { type, title, message, showConfirm, onConfirm };
+    this.showNotificationModal = true;
+  }
+
+  /**
+   * Close notification modal
+   */
+  closeNotification() {
+    this.showNotificationModal = false;
+    this.notification = {
+      type: '',
+      title: '',
+      message: '',
+      showConfirm: false,
+      onConfirm: undefined
+    };
   }
 
   /**
@@ -55,8 +87,7 @@ export class LocationsComponent implements OnInit {
       },
       error: () => {
         this.loading = false;
-        // Swal.fire('Error', 'Failed to load locations', 'error');
-        alert('Failed to load locations');
+        this.showNotification('error', 'Error', 'Failed to load locations');
       }
     });
   }
@@ -174,11 +205,11 @@ export class LocationsComponent implements OnInit {
 
     this.locationService.createLocation(payload).subscribe({
       next: () => {
-        alert('Location added successfully');
+        this.showNotification('success', 'Success', 'Location added successfully');
         this.closeModal();
         this.loadLocations(); // Reload current page
       },
-      error: () => alert('Failed to add location')
+      error: () => this.showNotification('error', 'Error', 'Failed to add location')
     });
   }
 
@@ -195,11 +226,11 @@ export class LocationsComponent implements OnInit {
 
     this.locationService.updateLocation(this.editId, payload).subscribe({
       next: () => {
-        alert('Location updated successfully');
+        this.showNotification('success', 'Success', 'Location updated successfully');
         this.closeModal();
         this.loadLocations(); // Reload current page
       },
-      error: () => alert('Failed to update location')
+      error: () => this.showNotification('error', 'Error', 'Failed to update location')
     });
   }
 
@@ -207,19 +238,23 @@ export class LocationsComponent implements OnInit {
    * Delete a location with confirmation
    */
   deleteLocation(loc: any) {
-    const confirmation = confirm('Are you sure you want to delete this location?');
-
-    if (confirmation) {
-      this.locationService.deleteLocation(loc._id).subscribe({
-        next: () => {
-          alert('Location deleted successfully');
-          this.loadLocations(); // Reload current page
-        },
-        error: () => {
-          alert('Failed to delete location');
-        }
-      });
-    }
+    this.showNotification(
+      'confirm', 
+      'Confirm Delete', 
+      `Are you sure you want to delete "${loc.name}" branch? This branch will be permanently deleted.`, 
+      true, 
+      () => {
+        this.locationService.deleteLocation(loc._id).subscribe({
+          next: () => {
+            this.showNotification('success', 'Success', 'Location deleted successfully');
+            this.loadLocations(); // Reload current page
+          },
+          error: () => {
+            this.showNotification('error', 'Error', 'Failed to delete location');
+          }
+        });
+      }
+    );
   }
 
   /**

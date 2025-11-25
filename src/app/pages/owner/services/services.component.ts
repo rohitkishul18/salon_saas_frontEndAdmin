@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ServiceService } from '../../../core/services/service.service';
+import { LocationService } from '../../../core/services/location.service';
 
 @Component({
   selector: 'app-services',
@@ -9,7 +10,11 @@ import { ServiceService } from '../../../core/services/service.service';
 export class ServicesComponent implements OnInit {
 
   services: any[] = [];
+  locations: any[] = [];
+  selectedLocations: any[] = [];  // Locations selected in the form
+  availableLocations: any[] = [];  // Locations not yet selected
   loading = false;
+  locationLoading = false;
 
   // Pagination
   currentPage = 1;
@@ -25,24 +30,146 @@ export class ServicesComponent implements OnInit {
     name: '',
     durationMinutes: '',
     price: '',
-    locationId: ''
+    locationIds: []
   };
 
-  constructor(private serviceApi: ServiceService) {}
+  // Notification Modal
+  showNotificationModal = false;
+  notification: any = {
+    title: '',
+    message: ''
+  };
+
+  // Delete Modal
+  showDeleteModal = false;
+  selectedService: any = null;
+
+  constructor(
+    private serviceApi: ServiceService,
+    private locationService: LocationService
+  ) {}
 
   ngOnInit() {
     this.loadServices();
+    this.loadLocations();
   }
 
-  // ------------------------------
-  // HELPERS
-  // ------------------------------
-  notify(msg: string) {
-    alert(msg);
+  /**
+   * Load all locations for the salon
+   */
+  loadLocations() {
+    this.locationLoading = true;
+    this.locationService.getLocations(1, 100).subscribe({
+      next: (res: any) => {
+        this.locations = res.data?.data || res.data || [];
+        this.updateAvailableLocations();
+        this.locationLoading = false;
+      },
+      error: () => {
+        this.showNotification('Error', 'Failed to load locations');
+        this.locationLoading = false;
+      }
+    });
   }
 
-  ask(msg: string) {
-    return confirm(msg);
+  /**
+   * Update available locations based on selected ones
+   */
+  updateAvailableLocations() {
+    const selectedIds = this.selectedLocations.map(loc => loc._id);
+    this.availableLocations = this.locations.filter(loc => !selectedIds.includes(loc._id));
+  }
+
+  /**
+   * Add a location from dropdown
+   */
+  addLocation(event: any) {
+    const locationId = event.target.value;
+    if (!locationId) return;
+
+    const location = this.locations.find(loc => loc._id === locationId);
+    if (location && !this.selectedLocations.find(loc => loc._id === locationId)) {
+      this.selectedLocations.push(location);
+      this.updateAvailableLocations();
+      this.updateFormLocationIds();
+    }
+
+    // Reset dropdown
+    event.target.value = '';
+  }
+
+  /**
+   * Remove a location chip
+   */
+  removeLocation(locationId: string) {
+    this.selectedLocations = this.selectedLocations.filter(loc => loc._id !== locationId);
+    this.updateAvailableLocations();
+    this.updateFormLocationIds();
+  }
+
+  /**
+   * Update form.locationIds array based on selected locations
+   */
+  updateFormLocationIds() {
+    this.form.locationIds = this.selectedLocations.map(loc => loc._id);
+  }
+
+  /**
+   * Show notification modal
+   */
+  showNotification(title: string, message: string) {
+    this.notification = { title, message };
+    this.showNotificationModal = true;
+  }
+
+  /**
+   * Close notification modal
+   */
+  closeNotification() {
+    this.showNotificationModal = false;
+  }
+
+  /**
+   * Open delete confirmation modal
+   */
+  openDeleteModal(service: any) {
+    this.selectedService = service;
+    this.showDeleteModal = true;
+  }
+
+  /**
+   * Close delete modal
+   */
+  closeDeleteModal() {
+    this.showDeleteModal = false;
+    this.selectedService = null;
+  }
+
+  /**
+   * Confirm and delete service
+   */
+  confirmDelete() {
+    if (!this.selectedService) return;
+
+    this.serviceApi.deleteService(this.selectedService._id || this.selectedService.id).subscribe({
+      next: () => {
+        this.showNotification('Success', 'Service deleted successfully');
+        this.loadServices();
+        this.closeDeleteModal();
+      },
+      error: () => {
+        this.showNotification('Error', 'Failed to delete service');
+        this.closeDeleteModal();
+      }
+    });
+  }
+
+  /**
+   * Get comma-separated location names for display in table
+   */
+  getLocationNames(item: any): string {
+    if (!item.locationIds || item.locationIds.length === 0) return '-';
+    return item.locationIds.map((loc: any) => loc.name || loc).join(', ');
   }
 
   getServiceInitial(name: string): string {
@@ -56,38 +183,61 @@ export class ServicesComponent implements OnInit {
 
   openModal(edit: boolean, data: any = null) {
     this.isEditing = edit;
-    console.log(edit, data);  
-    if (edit) {
+    
+    if (edit && data) {
       this.form = { 
-        ...data, 
-        locationId: data.locationId?._id || '' 
+        ...data,
+        locationIds: []
       };
+
+      // Populate selectedLocations from existing service data
+      if (data.locationIds && Array.isArray(data.locationIds)) {
+        this.selectedLocations = data.locationIds.map((loc: any) => {
+          // If loc is already an object with _id and name
+          if (typeof loc === 'object' && loc._id) {
+            return loc;
+          }
+          // If loc is just an ID string, find the full location object
+          return this.locations.find(l => l._id === loc) || { _id: loc, name: 'Unknown' };
+        });
+      } else {
+        this.selectedLocations = [];
+      }
+      
+      this.updateFormLocationIds();
+      this.updateAvailableLocations();
     } else {
+      // New service
       this.form = {
         id: null,
         name: '',
         durationMinutes: '',
         price: '',
-        locationId: ''
+        locationIds: []
       };
+      this.selectedLocations = [];
+      this.updateAvailableLocations();
     }
+    
     this.showModal = true;
   }
 
   closeModal() {
     this.showModal = false;
+    this.selectedLocations = [];
     this.form = {
       id: null,
       name: '',
       durationMinutes: '',
       price: '',
-      locationId: ''
+      locationIds: []
     };
+    this.updateAvailableLocations();
   }
 
-  // ------------------------------
-  // LOAD SERVICES
-  // ------------------------------
+  /**
+   * Load services with pagination
+   */
   loadServices(page?: number) {
     const p = page || this.currentPage;
     this.loading = true;
@@ -100,7 +250,7 @@ export class ServicesComponent implements OnInit {
         this.loading = false;
       },
       error: () => {
-        this.notify("Failed to fetch services");
+        this.showNotification('Error', 'Failed to fetch services');
         this.loading = false;
       }
     });
@@ -121,7 +271,7 @@ export class ServicesComponent implements OnInit {
     }
 
     if (this.currentPage - delta > 2) {
-      rangeWithEllipsis.push(1, -1); // -1 represents ellipsis
+      rangeWithEllipsis.push(1, -1);
     } else {
       rangeWithEllipsis.push(1);
     }
@@ -134,7 +284,7 @@ export class ServicesComponent implements OnInit {
       rangeWithEllipsis.push(this.totalPages);
     }
 
-    return rangeWithEllipsis.filter(p => p !== -1); // Filter out ellipsis for now; can add logic to show '...' if needed
+    return rangeWithEllipsis.filter(p => p !== -1);
   }
 
   getShowingFrom(): number {
@@ -145,13 +295,17 @@ export class ServicesComponent implements OnInit {
     return Math.min(this.currentPage * this.itemsPerPage, this.totalItems);
   }
 
-  // ------------------------------
-  // SAVE (ADD / UPDATE)
-  // ------------------------------
+  /**
+   * Save service (add or update)
+   */
   saveService() {
-    if (!this.form.name || !this.form.durationMinutes || !this.form.price || !this.form.locationId) {
-      return this.notify("All fields are required");
+    if (!this.form.name || !this.form.durationMinutes || !this.form.price || this.selectedLocations.length === 0) {
+      this.showNotification('Error', 'All fields are required, including at least one location');
+      return;
     }
+
+    // Ensure locationIds are up to date
+    this.updateFormLocationIds();
 
     this.isEditing ? this.updateService() : this.addService();
   }
@@ -159,37 +313,22 @@ export class ServicesComponent implements OnInit {
   addService() {
     this.serviceApi.addService(this.form).subscribe({
       next: () => {
-        this.notify("Service added successfully");
+        this.showNotification('Success', 'Service added successfully');
         this.closeModal();
         this.loadServices();
       },
-      error: () => this.notify("Failed to add service")
+      error: () => this.showNotification('Error', 'Failed to add service')
     });
   }
 
   updateService() {
     this.serviceApi.updateService(this.form._id || this.form.id, this.form).subscribe({
       next: () => {
-        this.notify("Service updated successfully");
+        this.showNotification('Success', 'Service updated successfully');
         this.closeModal();
         this.loadServices();
       },
-      error: () => this.notify("Failed to update service")
-    });
-  }
-
-  // ------------------------------
-  // DELETE
-  // ------------------------------
-  deleteService(item: any) {
-    if (!this.ask(`Delete service "${item.name}"?`)) return;
-
-    this.serviceApi.deleteService(item._id || item.id).subscribe({
-      next: () => {
-        this.notify("Service deleted successfully");
-        this.loadServices();
-      },
-      error: () => this.notify("Failed to delete service")
+      error: () => this.showNotification('Error', 'Failed to update service')
     });
   }
 

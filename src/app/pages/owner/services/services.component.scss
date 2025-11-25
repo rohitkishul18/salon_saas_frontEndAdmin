@@ -51,6 +51,17 @@
   }
 }
 
+@keyframes chipSlideIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 :host {
   display: block;
   min-height: 100vh;
@@ -64,7 +75,6 @@
   overflow: hidden;
 }
 
-// Background decorative shapes
 .background-shapes {
   position: fixed;
   top: 0;
@@ -117,7 +127,6 @@
   padding: 2rem;
 }
 
-// Page Header
 .dashboard-header {
   display: flex;
   justify-content: space-between;
@@ -169,7 +178,6 @@
   }
 }
 
-// Loading State
 .loading-state {
   display: flex;
   flex-direction: column;
@@ -195,7 +203,6 @@
   }
 }
 
-// Empty State
 .empty-state {
   text-align: center;
   padding: 4rem 2rem;
@@ -239,7 +246,6 @@
   }
 }
 
-// Table Section
 .table-section {
   background: white;
   border-radius: 20px;
@@ -297,7 +303,6 @@
     }
   }
 
-  // Table
   .table-container {
     overflow-x: auto;
     border-radius: 12px;
@@ -430,7 +435,6 @@
     }
   }
 
-  // Pagination
   .pagination-section {
     display: flex;
     justify-content: space-between;
@@ -485,7 +489,6 @@
   }
 }
 
-// Modal Styles
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -508,6 +511,10 @@
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   animation: modalSlideIn 0.3s ease-out;
   position: relative;
+
+  &.notification-modal {
+    max-width: 450px;
+  }
 
   .modal-header {
     display: flex;
@@ -545,6 +552,8 @@
 
     form {
       .form-group {
+        margin-bottom: 1.25rem;
+
         .form-label {
           display: block;
           font-size: 0.9rem;
@@ -582,7 +591,87 @@
             margin: 0;
           }
         }
+
+        .location-select {
+          cursor: pointer;
+        }
+
+        // Selected locations chips
+        .selected-chips {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.5rem;
+          margin-bottom: 1rem;
+          padding: 0.75rem;
+          background: #f8fafc;
+          border-radius: 12px;
+          border: 2px dashed #e2e8f0;
+
+          .location-chip {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            animation: chipSlideIn 0.3s ease-out;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+
+            .chip-text {
+              line-height: 1;
+            }
+
+            .chip-remove {
+              background: rgba(255, 255, 255, 0.2);
+              border: none;
+              color: white;
+              font-size: 1.25rem;
+              line-height: 1;
+              width: 20px;
+              height: 20px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              border-radius: 50%;
+              cursor: pointer;
+              transition: all 0.2s ease;
+              padding: 0;
+              font-weight: 700;
+
+              &:hover {
+                background: rgba(255, 255, 255, 0.3);
+                transform: scale(1.1);
+              }
+
+              &:active {
+                transform: scale(0.95);
+              }
+            }
+          }
+        }
+
+        .help-text {
+          display: block;
+          margin-top: 0.5rem;
+          font-size: 0.8rem;
+          color: #64748b;
+
+          &.success {
+            color: #10b981;
+            font-weight: 500;
+          }
+        }
       }
+    }
+
+    p {
+      margin: 0;
+      color: #374151;
+      font-size: 1rem;
+      line-height: 1.5;
     }
   }
 
@@ -624,11 +713,20 @@
           cursor: not-allowed;
         }
       }
+
+      &.btn-danger {
+        background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        color: white;
+
+        &:hover:not(:disabled) {
+          transform: translateY(-1px);
+          box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+      }
     }
   }
 }
 
-// Responsive Design
 @media (max-width: 1024px) {
   .dashboard-container {
     padding: 1.5rem;
@@ -692,5 +790,12 @@
   .modal-content {
     margin: 1rem;
     width: calc(100% - 2rem);
+  }
+
+  .selected-chips {
+    .location-chip {
+      font-size: 0.8rem;
+      padding: 0.4rem 0.6rem;
+    }
   }
 }

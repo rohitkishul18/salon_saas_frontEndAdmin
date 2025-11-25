@@ -27,6 +27,8 @@ export class DashboardComponent implements OnInit {
     locations: false
   };
 
+  showGuideModal = false;
+
   constructor(private salonService: SalonService) {}
 
   ngOnInit(): void {
@@ -49,6 +51,14 @@ export class DashboardComponent implements OnInit {
         alert('Failed to load dashboard');
       }
     });
+  }
+
+  openGuide() {
+    this.showGuideModal = true;
+  }
+
+  closeGuide() {
+    this.showGuideModal = false;
   }
 
   getInitials(name: string): string {

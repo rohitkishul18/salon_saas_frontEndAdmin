@@ -40,6 +40,11 @@
   }
 }
 
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
 :host {
   display: block;
   min-height: 100vh;
@@ -448,6 +453,7 @@
       font-size: 0.85rem;
       cursor: pointer;
       transition: all 0.3s ease;
+      text-decoration: none;
 
       .arrow {
         transition: transform 0.3s ease;
@@ -645,6 +651,10 @@
         background: #10b981;
       }
 
+      &.complete {
+        background: rgba(16, 185, 129, 0.05);
+      }
+
       .status-icon {
         font-size: 1.5rem;
         flex-shrink: 0;
@@ -673,6 +683,116 @@
         &.complete & {
           background: rgba(16, 185, 129, 0.1);
           color: #10b981;
+        }
+      }
+    }
+  }
+}
+
+// Modal Styles
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  max-width: 600px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  position: relative;
+  animation: fadeInUp 0.3s ease-out;
+
+  .modal-header {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+
+    h3 {
+      margin: 0;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #1e293b;
+    }
+
+    .modal-icon {
+      font-size: 1.5rem;
+    }
+  }
+
+  .modal-body {
+    color: #475569;
+    line-height: 1.6;
+    font-size: 0.95rem;
+
+    .guide-steps {
+      margin: 1rem 0;
+      padding-left: 1.25rem;
+
+      li {
+        margin-bottom: 0.75rem;
+        color: #334155;
+
+        strong {
+          color: #1e293b;
+        }
+
+        a {
+          color: #667eea;
+          text-decoration: none;
+          font-weight: 500;
+
+          &:hover {
+            text-decoration: underline;
+          }
+        }
+      }
+    }
+
+    .guide-note {
+      background: #f8fafc;
+      padding: 1rem;
+      border-radius: 8px;
+      border-left: 4px solid #e2e8f0;
+      margin-top: 1rem;
+      color: #64748b;
+      font-style: italic;
+    }
+  }
+
+  .modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+
+    .modal-btn {
+      padding: 0.75rem 1.5rem;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      border: none;
+
+      &.cancel {
+        background: #f1f5f9;
+        color: #64748b;
+
+        &:hover {
+          background: #e2e8f0;
         }
       }
     }
@@ -719,5 +839,14 @@
 
   .status-grid {
     grid-template-columns: 1fr;
+  }
+
+  .modal-content {
+    width: 95%;
+    padding: 1.5rem;
+  }
+
+  .guide-steps {
+    padding-left: 1rem;
   }
 }

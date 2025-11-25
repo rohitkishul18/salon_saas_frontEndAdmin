@@ -22,6 +22,7 @@ import { RouterModule } from '@angular/router';
 import { BookingComponent } from './pages/owner/booking/booking.component';
 import { LayoutdashbordComponent } from './pages/superadmin/layoutdashbord/layoutdashbord.component';
 import { ForgetPasswordComponent } from './pages/auth/forget-password/forget-password.component';
+import { CommonModule } from '@angular/common';
 
 
 @NgModule({
@@ -50,7 +51,8 @@ import { ForgetPasswordComponent } from './pages/auth/forget-password/forget-pas
     FormsModule,
     ReactiveFormsModule,
     RouterModule,
-    HttpClientModule 
+    HttpClientModule,
+    CommonModule
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true }
