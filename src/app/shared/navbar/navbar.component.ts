@@ -81,10 +81,7 @@ export class NavbarComponent implements OnInit {
 
   logout(): void {
     // Clear all user-related data
-    const keysToRemove = ['token', 'role', 'userData', 'userName', 'userEmail', 'salonId'];
-    keysToRemove.forEach(key => localStorage.removeItem(key));
-    
-    // Navigate to login
+    localStorage.clear();
     this.router.navigate(['/login']);
   }
 }

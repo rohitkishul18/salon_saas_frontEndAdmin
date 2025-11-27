@@ -1,0 +1,214 @@
+<div class="dashboard-wrapper">
+  
+  <!-- Animated Background Elements -->
+  <div class="background-shapes">
+    <span class="shape shape-1"></span>
+    <span class="shape shape-2"></span>
+    <span class="shape shape-3"></span>
+  </div>
+
+  <div class="dashboard-container">
+    
+    <!-- Page Header -->
+    <div class="dashboard-header">
+      <div class="header-content">
+        <h2 class="dashboard-title">Registered Customers</h2>
+        <p class="dashboard-subtitle">View all customers who have registered with your salon</p>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading-state">
+      <div class="spinner"></div>
+      <p>Loading customers...</p>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!loading && customers.length === 0" class="empty-state">
+      <div class="empty-icon">👥</div>
+      <h4>No Customers Yet</h4>
+      <p>Customers will appear here once they register through your salon's booking system</p>
+      <p class="empty-hint">Share your salon link to encourage registrations!</p>
+    </div>
+
+    <!-- Customers Table Section -->
+    <div *ngIf="!loading && customers.length > 0" class="table-section">
+      
+      <div class="section-header">
+        <div>
+          <h3 class="section-title">All Registered Customers</h3>
+          <p class="section-subtitle">
+            Showing {{ getShowingFrom() }} to {{ getShowingTo() }} of {{ totalItems }} customer{{ totalItems !== 1 ? 's' : '' }}
+          </p>
+        </div>
+        <button class="refresh-btn" (click)="refreshCustomers()">
+          <span>Refresh</span>
+          <span class="arrow">↻</span>
+        </button>
+      </div>
+
+      <!-- Table -->
+      <div class="table-container">
+        <table class="modern-table">
+          <thead>
+            <tr>
+              <th>
+                <span class="th-content">
+                  <span class="th-icon">👤</span>
+                  Full Name
+                </span>
+              </th>
+              <th>
+                <span class="th-content">
+                  <span class="th-icon">📧</span>
+                  Email
+                </span>
+              </th>
+              <th>
+                <span class="th-content">
+                  <span class="th-icon">📱</span>
+                  Phone
+                </span>
+              </th>
+              <th>
+                <span class="th-content">
+                  <span class="th-icon">📅</span>
+                  Registration Date
+                </span>
+              </th>
+              <th>
+                <span class="th-content">
+                  <span class="th-icon">👁️</span>
+                  Actions
+                </span>
+              </th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr *ngFor="let customer of customers; let i = index" 
+                class="table-row"
+                [style.animation-delay]="(i * 0.1) + 's'">
+              
+              <td>
+                <div class="customer-name">
+                  <div class="customer-avatar">
+                    {{ getCustomerInitial(customer.fullName) }}
+                  </div>
+                  <span class="font-medium">{{ customer.fullName }}</span>
+                </div>
+              </td>
+
+              <td>
+                <span class="email-text">{{ customer.email }}</span>
+              </td>
+
+              <td>
+                <span class="phone-text">{{ customer.phone }}</span>
+              </td>
+
+              <td>
+                <span class="date-text">{{ customer.createdAt | date:'mediumDate' }}</span>
+              </td>
+
+              <td>
+                <div class="actions">
+                  <button 
+                    class="action-btn view-btn"
+                    (click)="viewCustomer(customer)"
+                  >
+                    <span class="icon">👁️</span>
+                    <span>View</span>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination-section">
+        <div class="pagination-info">
+          <span>Page {{ currentPage }} of {{ totalPages }}</span>
+        </div>
+        <div class="pagination-controls">
+          <button 
+            class="pag-btn" 
+            (click)="changePage(currentPage - 1)"
+            [disabled]="currentPage === 1"
+          >
+            <span>‹ Previous</span>
+          </button>
+          <button 
+            *ngFor="let page of getVisiblePages()"
+            class="pag-btn"
+            [class.active]="page === currentPage"
+            (click)="changePage(page)"
+          >
+            {{ page }}
+          </button>
+          <button 
+            class="pag-btn" 
+            (click)="changePage(currentPage + 1)"
+            [disabled]="currentPage === totalPages"
+          >
+            <span>Next ›</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+  <!-- View Customer Modal -->
+  <div 
+    *ngIf="showViewModal" 
+    class="modal-overlay"
+    (click)="closeViewModal()"
+  >
+    <div class="modal-content view-modal" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3 class="modal-title">
+          <span class="info-icon">👤</span>
+          Customer Details
+        </h3>
+        <button class="close-btn" (click)="closeViewModal()">
+          <span>×</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="customer-details">
+          <div class="detail-row">
+            <span class="detail-label">Full Name:</span>
+            <span class="detail-value">{{ selectedCustomer?.fullName }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Email:</span>
+            <span class="detail-value">{{ selectedCustomer?.email }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Phone:</span>
+            <span class="detail-value">{{ selectedCustomer?.phone }}</span>
+          </div>
+          <div class="detail-row">
+            <span class="detail-label">Registered On:</span>
+            <span class="detail-value">{{ selectedCustomer?.createdAt | date:'fullDate' }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button 
+          (click)="closeViewModal()" 
+          class="btn btn-primary"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div>

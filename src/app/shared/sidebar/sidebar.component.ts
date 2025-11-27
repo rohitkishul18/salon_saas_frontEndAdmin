@@ -37,6 +37,7 @@ export class SidebarComponent implements OnInit {
           { label: 'Branches', icon: '📍', route: '/salon-owner/locations' },
           { label: 'Bookings', icon: '📅', route: '/salon-owner/booking' },
           { label: 'Services', icon: '💇‍♂️', route: '/salon-owner/services' },
+          { label: 'Customers', icon: '👥', route: '/salon-owner/user' } ,
         ];
         break;
     }

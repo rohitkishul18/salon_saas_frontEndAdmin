@@ -26,7 +26,7 @@ export class TokenInterceptor implements HttpInterceptor {
         // TOKEN INVALID / EXPIRED
         if (error.status === 401) {
           localStorage.clear();
-          alert('Session expired! Please login again.');
+          alert('not authorized, please login again');
           this.router.navigate(['/login']);
         }
 

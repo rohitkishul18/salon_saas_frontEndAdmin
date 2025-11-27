@@ -23,6 +23,9 @@ import { BookingComponent } from './pages/owner/booking/booking.component';
 import { LayoutdashbordComponent } from './pages/superadmin/layoutdashbord/layoutdashbord.component';
 import { ForgetPasswordComponent } from './pages/auth/forget-password/forget-password.component';
 import { CommonModule } from '@angular/common';
+import { ResetPasswordComponent } from './pages/auth/reset-password/reset-password.component';
+import { TermsConditionsComponent } from './pages/auth/terms-conditions/terms-conditions.component';
+import { UserComponent } from './pages/owner/user/user.component';
 
 
 @NgModule({
@@ -44,6 +47,9 @@ import { CommonModule } from '@angular/common';
     BookingComponent,
     LayoutdashbordComponent,
     ForgetPasswordComponent,
+    ResetPasswordComponent,
+    TermsConditionsComponent,
+    UserComponent,
   ],
   imports: [
     BrowserModule,

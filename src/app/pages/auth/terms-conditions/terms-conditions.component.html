@@ -1,0 +1,147 @@
+<!-- terms-conditions.component.html -->
+<div 
+  *ngIf="showModal" 
+  class="modal-backdrop"
+  (click)="closeModal()"
+>
+  <div 
+    class="modal-container"
+    (click)="$event.stopPropagation()"
+  >
+    <!-- Header -->
+    <div class="modal-header">
+      <div class="header-content">
+        <div class="icon-wrapper">
+          <svg class="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+          </svg>
+        </div>
+        <div class="title-section">
+          <h2 class="modal-title">Terms & Conditions</h2>
+          <p class="last-updated">Last updated: November 27, 2025</p>
+        </div>
+      </div>
+      <button 
+        class="close-button" 
+        (click)="closeModal()"
+        aria-label="Close modal"
+      >
+        <svg class="close-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Body -->
+    <div class="modal-body">
+      
+      <section class="content-section">
+        <h3>1. Introduction</h3>
+        <p>
+          Welcome to our Salon Management Platform ("Service", "Platform"). These Terms and Conditions ("Terms") govern your use of the Platform operated by [Your Company Name] ("us", "we", or "our"). By accessing or using the Platform, you agree to be bound by these Terms. If you disagree with any part of the Terms, then you may not access the Platform.
+        </p>
+      </section>
+
+      <section class="content-section">
+        <h3>2. User Eligibility</h3>
+        <p>
+          You must be at least 18 years old to use this Platform. By creating an account and using the Service, you represent and warrant that you meet the eligibility requirements.
+        </p>
+      </section>
+
+      <section class="content-section">
+        <h3>3. Account Registration</h3>
+        <p>
+          To access certain features of the Platform, you must register for an account. You agree to provide accurate, current, and complete information during the registration process and to update such information as necessary. You are responsible for safeguarding your password and for any activities occurring under your account.
+        </p>
+      </section>
+
+      <section class="content-section">
+        <h3>4. Salon Ownership and Responsibilities</h3>
+        <p>
+          As a salon owner, you agree to use the Platform solely for lawful purposes and in compliance with all applicable laws and regulations. You are responsible for all content, including salon information, services, and bookings, that you upload or manage on the Platform. You represent that you have the necessary rights to such content.
+        </p>
+      </section>
+
+      <section class="content-section">
+        <h3>5. Payments and Fees</h3>
+        <p>
+          The Platform may involve fees for certain services. All payments are processed securely. You agree to pay all applicable fees as described in our Pricing page. We reserve the right to modify fees at any time with notice.
+        </p>
+      </section>
+
+      <section class="content-section">
+        <h3>6. Intellectual Property</h3>
+        <p>
+          The Platform and its original content (excluding User Content), features, and functionality are owned by [Your Company Name] and are protected by international copyright, trademark, patent, trade secret, and other intellectual property or proprietary rights laws. Your use of the Platform does not grant you ownership of any intellectual property rights.
+        </p>
+      </section>
+
+      <section class="content-section">
+        <h3>7. User Content</h3>
+        <p>
+          You retain ownership of any content you submit, post, or display on or through the Platform ("User Content"). By submitting User Content, you grant us a worldwide, non-exclusive, royalty-free license to use, reproduce, distribute, and display such content in connection with the Service.
+        </p>
+      </section>
+
+      <section class="content-section">
+        <h3>8. Prohibited Activities</h3>
+        <p>
+          You agree not to: (a) use the Platform for any illegal purpose; (b) upload viruses or malicious code; (c) attempt to gain unauthorized access; (d) harass or discriminate against others; (e) violate any third-party rights.
+        </p>
+      </section>
+
+      <section class="content-section">
+        <h3>9. Termination</h3>
+        <p>
+          We may terminate or suspend your account immediately, without prior notice, for conduct that we believe violates these Terms or is harmful to other users or the Platform.
+        </p>
+      </section>
+
+      <section class="content-section">
+        <h3>10. Limitation of Liability</h3>
+        <p>
+          To the fullest extent permitted by law, the Platform is provided "as is" without warranties. We disclaim all warranties, express or implied. In no event shall we be liable for indirect, incidental, or consequential damages.
+        </p>
+      </section>
+
+      <section class="content-section">
+        <h3>11. Governing Law</h3>
+        <p>
+          These Terms shall be governed by and construed in accordance with the laws of [Your Jurisdiction], without regard to its conflict of law provisions.
+        </p>
+      </section>
+
+      <section class="content-section">
+        <h3>12. Changes to Terms</h3>
+        <p>
+          We reserve the right to modify these Terms at any time. We will notify you of changes by posting the new Terms on the Platform. Continued use after changes constitutes acceptance.
+        </p>
+      </section>
+
+      <section class="content-section">
+        <h3>13. Contact Us</h3>
+        <p>
+          If you have any questions about these Terms, please contact us at support@[yourcompany].com.
+        </p>
+      </section>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="modal-footer">
+      <button 
+        class="accept-button"
+        (click)="closeModal()"
+      >
+        <span class="button-content">
+          I've Read and Accept
+          <svg class="check-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+          </svg>
+        </span>
+      </button>
+      <p class="footer-note">By closing this modal, you agree to the terms above.</p>
+    </div>
+  </div>
+</div>

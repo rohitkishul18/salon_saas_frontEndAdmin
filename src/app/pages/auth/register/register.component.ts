@@ -1,3 +1,4 @@
+// Updated register.component.ts
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
@@ -20,8 +21,23 @@ export class RegisterComponent {
   isLoading: boolean = false;
   errorMessage: string = '';
   fieldErrors: { [key: string]: string } = {};
+  showTermsModal: boolean = false; // New: Terms modal state
 
   constructor(private authService: AuthService, private router: Router) {}
+
+  /**
+   * Open Terms & Conditions modal
+   */
+  openTermsModal(): void {
+    this.showTermsModal = true;
+  }
+
+  /**
+   * Close Terms & Conditions modal
+   */
+  closeTermsModal(): void {
+    this.showTermsModal = false;
+  }
 
   /**
    * Validate all form fields
@@ -61,11 +77,17 @@ export class RegisterComponent {
       isValid = false;
     }
 
-    // Phone validation (optional but if provided, must be valid)
-    if (this.phone && this.phone.trim().length > 0) {
+    // Phone validation (required)
+    if (!this.phone || this.phone.trim().length === 0) {
+      this.fieldErrors['phone'] = 'Phone number is required';
+      isValid = false;
+    } else {
       const phoneDigits = this.phone.replace(/\D/g, '');
       if (phoneDigits.length !== 10) {
         this.fieldErrors['phone'] = 'Phone number must be 10 digits';
+        isValid = false;
+      } else if (!/^\d{10}$/.test(phoneDigits)) {
+        this.fieldErrors['phone'] = 'Phone number must contain only digits';
         isValid = false;
       }
     }
@@ -116,7 +138,7 @@ export class RegisterComponent {
 
       // Store salon ID
       if (responseData.user?.salonId) {
-        localStorage.setItem('salonId', JSON.stringify(responseData.user.salonId));
+        localStorage.setItem('salonId', responseData.user.salonId);
       } else {
         localStorage.setItem('salonId', '');
       }

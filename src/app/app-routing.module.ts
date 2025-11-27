@@ -13,12 +13,15 @@ import { authGuard } from './core/guards/auth.guard';
 import { BookingComponent } from './pages/owner/booking/booking.component';
 import { LayoutdashbordComponent } from './pages/superadmin/layoutdashbord/layoutdashbord.component';
 import { ForgetPasswordComponent } from './pages/auth/forget-password/forget-password.component';
+import { ResetPasswordComponent } from './pages/auth/reset-password/reset-password.component';
+import { UserComponent } from './pages/owner/user/user.component';
 
 const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
   { path: 'register', component: RegisterComponent }, 
   {path:'forgot-password',component:ForgetPasswordComponent},
+  {path :'reset-password', component:ResetPasswordComponent},
 
   // Superadmin Routes
 {
@@ -44,6 +47,7 @@ const routes: Routes = [
     { path: 'locations', component: LocationsComponent },
     { path: 'services', component: ServicesComponent },
      {path:'booking',component:BookingComponent},
+     {path:'user', component:UserComponent},
   ]
 },
   // Wildcard redirect
