@@ -16,32 +16,26 @@ export class RegisterComponent {
   phone: string = '';
   password: string = '';
   termsAccepted: boolean = false;
-
-  // UI state
   isLoading: boolean = false;
   errorMessage: string = '';
   fieldErrors: { [key: string]: string } = {};
-  showTermsModal: boolean = false; // New: Terms modal state
+  showTermsModal: boolean = false;
+  showPassword: boolean = false; 
 
   constructor(private authService: AuthService, private router: Router) {}
 
-  /**
-   * Open Terms & Conditions modal
-   */
+  togglePassword(): void {
+    this.showPassword = !this.showPassword;
+  }
+
   openTermsModal(): void {
     this.showTermsModal = true;
   }
 
-  /**
-   * Close Terms & Conditions modal
-   */
   closeTermsModal(): void {
     this.showTermsModal = false;
   }
 
-  /**
-   * Validate all form fields
-   */
   private validateForm(): boolean {
     this.fieldErrors = {};
     this.errorMessage = '';
@@ -113,37 +107,27 @@ export class RegisterComponent {
     return isValid;
   }
 
-  /**
-   * Email validation helper
-   */
   private isValidEmail(email: string): boolean {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return emailRegex.test(email.trim());
   }
 
-  /**
-   * Store user data in localStorage
-   */
   private storeUserData(responseData: any): void {
     try {
-      // Store token
       if (responseData.token) {
         localStorage.setItem('token', responseData.token);
       }
 
-      // Store user role
       if (responseData.user?.role) {
         localStorage.setItem('role', responseData.user.role);
       }
 
-      // Store salon ID
       if (responseData.user?.salonId) {
         localStorage.setItem('salonId', responseData.user.salonId);
       } else {
         localStorage.setItem('salonId', '');
       }
 
-      // Store complete user object
       if (responseData.user) {
         localStorage.setItem('user', JSON.stringify(responseData.user));
       }
@@ -152,9 +136,7 @@ export class RegisterComponent {
     }
   }
 
-  /**
-   * Navigate based on user role
-   */
+
   private navigateBasedOnRole(role: string): void {
     switch (role) {
       case 'superadmin':
@@ -168,9 +150,6 @@ export class RegisterComponent {
     }
   }
 
-  /**
-   * Clear error for specific field
-   */
   clearFieldError(fieldName: string): void {
     if (this.fieldErrors[fieldName]) {
       delete this.fieldErrors[fieldName];
@@ -180,9 +159,6 @@ export class RegisterComponent {
     }
   }
 
-  /**
-   * Register user
-   */
   register(): void {
     // Validate form
     if (!this.validateForm()) {
@@ -206,8 +182,6 @@ export class RegisterComponent {
     this.authService.register(payload).subscribe({
       next: (res: any) => {
         this.isLoading = false;
-
-        // Store user data in localStorage
         if (res.data) {
           this.storeUserData(res.data);
 
@@ -215,7 +189,6 @@ export class RegisterComponent {
           if (res.data.user?.role) {
             this.navigateBasedOnRole(res.data.user.role);
           } else {
-            // If no role returned, redirect to login
             this.router.navigate(['/login']);
           }
         } else {

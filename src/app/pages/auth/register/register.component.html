@@ -124,13 +124,31 @@
             <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
           </svg>
           <input 
-            type="password" 
+            [type]="showPassword ? 'text' : 'password'"
             name="password" 
             [(ngModel)]="password" 
             (input)="clearFieldError('password')"
             [disabled]="isLoading"
+            class="password-input"
             placeholder="Create a strong password" 
           />
+          <button 
+            type="button" 
+            class="toggle-password" 
+            (click)="togglePassword()" 
+            [disabled]="isLoading"
+            [attr.aria-label]="showPassword ? 'Hide password' : 'Show password'"
+          >
+            <svg *ngIf="!showPassword" class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+              <circle cx="12" cy="12" r="3"></circle>
+            </svg>
+            <svg *ngIf="showPassword" class="eye-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="m2.07 2 1.414 1.414"></path>
+              <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12s4.477 10 10 10 10-4.477 10-10Z" stroke-linejoin="round"></path>
+              <path d="M15 15a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z"></path>
+            </svg>
+          </button>
         </div>
         <span class="field-error" *ngIf="fieldErrors['password']">{{ fieldErrors['password'] }}</span>
         <span class="field-hint">Must be 8+ characters with uppercase, lowercase, and number</span>
