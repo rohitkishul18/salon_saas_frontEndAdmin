@@ -338,14 +338,14 @@
   .modern-table {
     width: 100%;
     border-collapse: collapse;
-    // Removed table-layout: fixed; to allow natural content-based sizing
+    table-layout: fixed;
 
     thead {
       background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
 
       tr {
         th {
-          padding: 1rem 0.75rem;
+          padding: 1rem 0.5rem;
           text-align: left;
           font-size: 0.8rem;
           font-weight: 700;
@@ -353,17 +353,7 @@
           text-transform: uppercase;
           letter-spacing: 0.5px;
           border-bottom: 2px solid #e2e8f0;
-
-          // Specific column widths to prevent overlap
-          &:nth-child(1) { width: 14%; min-width: 140px; } // Customer
-          &:nth-child(2) { width: 12%; min-width: 120px; } // Phone
-          &:nth-child(3) { width: 12%; min-width: 100px; } // Branch
-          &:nth-child(4) { width: 18%; min-width: 160px; } // Service
-          &:nth-child(5) { width: 10%; min-width: 100px; } // Date
-          &:nth-child(6) { width: 8%; min-width: 80px; } // Time
-          &:nth-child(7) { width: 8%; min-width: 80px; } // Amount
-          &:nth-child(8) { width: 10%; min-width: 90px; } // Status
-          &:nth-child(9) { width: 8%; min-width: 120px; } // Actions
+          width: auto;
 
           .th-content {
             display: flex;
@@ -392,21 +382,10 @@
         }
 
         td {
-          padding: 1rem 0.75rem;
+          padding: 1rem 0.5rem;
           color: #334155;
           font-size: 0.85rem;
           vertical-align: middle;
-
-          // Inherit widths from th for alignment
-          &:nth-child(1) { width: 14%; } // Customer
-          &:nth-child(2) { width: 12%; } // Phone
-          &:nth-child(3) { width: 12%; } // Branch
-          &:nth-child(4) { width: 18%; } // Service
-          &:nth-child(5) { width: 10%; } // Date
-          &:nth-child(6) { width: 8%; } // Time
-          &:nth-child(7) { width: 8%; } // Amount
-          &:nth-child(8) { width: 10%; } // Status
-          &:nth-child(9) { width: 8%; } // Actions
 
           .customer-name {
             display: flex;
@@ -433,7 +412,6 @@
               overflow: hidden;
               text-overflow: ellipsis;
               white-space: nowrap;
-              max-width: 100px; // Prevent overflow in narrow column
             }
           }
 
@@ -446,8 +424,6 @@
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
-            display: block;
-            max-width: 100%;
           }
 
           .amount-text {
@@ -456,7 +432,6 @@
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
-            display: block;
           }
 
           .branch-info {
@@ -471,7 +446,7 @@
               overflow: hidden;
               text-overflow: ellipsis;
               white-space: nowrap;
-              max-width: 80px; // Adjusted for branch column
+              max-width: 100px;
             }
           }
 
@@ -485,7 +460,6 @@
             font-weight: 600;
             min-width: 70px;
             text-align: center;
-            white-space: nowrap;
 
             &.status-pending {
               background: rgba(245, 158, 11, 0.1);
@@ -511,28 +485,22 @@
           .actions {
             display: flex;
             gap: 0.25rem;
-            flex-wrap: nowrap; // Prevent wrapping to avoid height issues
 
             .action-btn {
               display: flex;
               align-items: center;
               gap: 0.125rem;
-              padding: 0.375rem 0.5rem; // Reduced padding for better fit
+              padding: 0.375rem 0.75rem;
               border-radius: 6px;
-              font-size: 0.7rem; // Slightly smaller font
+              font-size: 0.75rem;
               font-weight: 500;
               cursor: pointer;
               transition: all 0.3s ease;
               border: none;
               white-space: nowrap;
-              flex: 1; // Equal distribution in actions column
 
               .icon {
-                font-size: 0.75rem; // Smaller icon
-              }
-
-              span:last-child {
-                display: none; // Hide text labels in actions buttons to save space; rely on icons and titles
+                font-size: 0.875rem;
               }
 
               &.view-btn {
@@ -894,12 +862,6 @@
     align-items: flex-start;
     gap: 1rem;
   }
-
-  .modern-table {
-    // Adjust widths for smaller screens
-    th:nth-child(1), td:nth-child(1) { width: 16%; min-width: 120px; }
-    th:nth-child(4), td:nth-child(4) { width: 20%; min-width: 140px; }
-  }
 }
 
 @media (max-width: 768px) {
@@ -928,32 +890,17 @@
 
     thead th,
     tbody td {
-      padding: 0.75rem 0.5rem; // Slightly reduced padding
+      padding: 0.5rem 0.25rem;
     }
 
-    // Mobile-specific widths
-    th:nth-child(1), td:nth-child(1) { width: 20%; min-width: 100px; }
-    th:nth-child(2), td:nth-child(2) { width: 15%; min-width: 90px; }
-    th:nth-child(3), td:nth-child(3) { width: 15%; min-width: 80px; }
-    th:nth-child(4), td:nth-child(4) { width: 25%; min-width: 120px; }
-    th:nth-child(5), td:nth-child(5) { width: 10%; }
-    th:nth-child(6), td:nth-child(6) { width: 8%; }
-    th:nth-child(7), td:nth-child(7) { width: 8%; }
-    th:nth-child(8), td:nth-child(8) { width: 12%; }
-    th:nth-child(9), td:nth-child(9) { width: 7%; min-width: 80px; }
-
     .actions {
-      flex-direction: row; // Keep horizontal but tighter
+      flex-direction: column;
       gap: 0.125rem;
 
       .action-btn {
         justify-content: center;
-        padding: 0.25rem 0.25rem; // Even tighter
-        font-size: 0.65rem;
-
-        .icon {
-          font-size: 0.7rem;
-        }
+        padding: 0.25rem 0.5rem;
+        font-size: 0.7rem;
       }
     }
 
@@ -965,25 +912,17 @@
         height: 28px;
         font-size: 0.75rem;
       }
-
-      .font-medium {
-        max-width: 60px; // Tighter for mobile
-      }
     }
 
     .branch-badge {
-      max-width: 50px;
+      max-width: 60px;
       font-size: 0.7rem;
     }
 
     .status-badge {
-      min-width: 55px;
-      padding: 0.25rem 0.4rem;
+      min-width: 60px;
+      padding: 0.25rem 0.5rem;
       font-size: 0.7rem;
-    }
-
-    .service-text {
-      font-size: 0.8rem; // Slightly smaller for long services
     }
   }
 
