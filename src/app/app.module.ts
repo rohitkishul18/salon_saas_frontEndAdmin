@@ -26,6 +26,7 @@ import { CommonModule } from '@angular/common';
 import { ResetPasswordComponent } from './pages/auth/reset-password/reset-password.component';
 import { TermsConditionsComponent } from './pages/auth/terms-conditions/terms-conditions.component';
 import { UserComponent } from './pages/owner/user/user.component';
+import { NotFoundComponent } from './pages/not-found/not-found.component';
 
 
 @NgModule({
@@ -50,6 +51,7 @@ import { UserComponent } from './pages/owner/user/user.component';
     ResetPasswordComponent,
     TermsConditionsComponent,
     UserComponent,
+    NotFoundComponent,
   ],
   imports: [
     BrowserModule,

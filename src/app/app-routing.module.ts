@@ -15,6 +15,7 @@ import { LayoutdashbordComponent } from './pages/superadmin/layoutdashbord/layou
 import { ForgetPasswordComponent } from './pages/auth/forget-password/forget-password.component';
 import { ResetPasswordComponent } from './pages/auth/reset-password/reset-password.component';
 import { UserComponent } from './pages/owner/user/user.component';
+import { NotFoundComponent } from './pages/not-found/not-found.component';
 
 const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -51,7 +52,7 @@ const routes: Routes = [
   ]
 },
   // Wildcard redirect
-  { path: '**', redirectTo: 'login' }
+  { path: '**', component: NotFoundComponent }
 ];
 
 @NgModule({
