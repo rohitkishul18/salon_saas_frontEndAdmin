@@ -269,12 +269,28 @@
   .form-group {
     margin-bottom: 1.5rem;
 
+    &.has-error {
+      .input-wrapper input {
+        border-color: #f56565;
+        
+        &:focus {
+          border-color: #f56565;
+          box-shadow: 0 0 0 3px rgba(245, 101, 101, 0.1);
+        }
+      }
+    }
+
     label {
       display: block;
       margin-bottom: 0.5rem;
       font-weight: 600;
       color: #2d3748;
       font-size: 0.9rem;
+
+      .required {
+        color: #f56565;
+        margin-left: 2px;
+      }
     }
 
     .input-wrapper {
@@ -354,6 +370,14 @@
           opacity: 0.5;
         }
       }
+    }
+
+    .field-error {
+      display: block;
+      margin-top: 0.5rem;
+      color: #f56565;
+      font-size: 0.85rem;
+      font-weight: 500;
     }
   }
 

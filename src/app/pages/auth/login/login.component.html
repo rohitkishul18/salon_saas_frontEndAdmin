@@ -40,9 +40,11 @@
       <p>Please login to your account</p>
     </div>
 
-    <form (ngSubmit)="login()" #loginForm="ngForm">
-      <div class="form-group">
-        <label>Email</label>
+    <form [formGroup]="loginForm" (ngSubmit)="login()">
+      
+      <!-- Email -->
+      <div class="form-group" [class.has-error]="!!loginForm.get('email')?.invalid && loginForm.get('email')?.touched">
+        <label>Email <span class="required">*</span></label>
         <div class="input-wrapper">
           <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
@@ -50,17 +52,21 @@
           </svg>
           <input 
             type="email" 
-            [(ngModel)]="email"
-            name="email" 
-            required 
-            placeholder="Enter your email"
+            formControlName="email"
+            (input)="onInput('email')"
             [disabled]="isLoading"
+            placeholder="Enter your email"
           />
         </div>
+        <span class="field-error" *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched">
+          <span *ngIf="loginForm.get('email')?.errors?.['required']">Email is required</span>
+          <span *ngIf="loginForm.get('email')?.errors?.['email']">Please enter a valid email address</span>
+        </span>
       </div>
 
-      <div class="form-group">
-        <label>Password</label>
+      <!-- Password -->
+      <div class="form-group" [class.has-error]="!!loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
+        <label>Password <span class="required">*</span></label>
         <div class="input-wrapper password-wrapper">
           <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
@@ -68,11 +74,10 @@
           </svg>
           <input 
             [type]="showPassword ? 'text' : 'password'" 
-            [(ngModel)]="password"
-            name="password" 
-            required 
-            placeholder="Enter your password"
+            formControlName="password"
+            (input)="onInput('password')"
             [disabled]="isLoading"
+            placeholder="Enter your password"
           />
           <button 
             type="button" 
@@ -90,13 +95,16 @@
             </svg>
           </button>
         </div>
+        <span class="field-error" *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
+          <span *ngIf="loginForm.get('password')?.errors?.['required']">Password is required</span>
+        </span>
       </div>
 
       <div class="form-options">
         <a class="forgot-password" routerLink="/forgot-password">Forgot Password?</a>
       </div>
 
-      <button type="submit" class="login-btn" [disabled]="isLoading">
+      <button type="submit" class="login-btn" [disabled]="isLoading || loginForm.invalid">
         <span *ngIf="!isLoading">Login</span>
         <span *ngIf="isLoading" class="loading-spinner"></span>
         <span *ngIf="isLoading">Logging in...</span>

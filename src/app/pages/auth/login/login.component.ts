@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 
@@ -7,9 +8,8 @@ import { AuthService } from '../../../core/services/auth.service';
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
 })
-export class LoginComponent {
-  email: string = '';
-  password: string = '';
+export class LoginComponent implements OnInit, OnDestroy {
+  loginForm: FormGroup;
   showPassword: boolean = false;
   isLoading: boolean = false;
   
@@ -18,7 +18,28 @@ export class LoginComponent {
   notificationType: 'success' | 'error' = 'success';
   notificationMessage: string = '';
 
-  constructor(private authService: AuthService, private router: Router) {}
+  private timeoutId: any;
+
+  constructor(private fb: FormBuilder, private authService: AuthService, private router: Router) {
+    this.loginForm = this.fb.group({
+      email: ['', [Validators.required, Validators.email, Validators.pattern(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)]],
+      password: ['', [Validators.required]]
+    });
+  }
+
+  ngOnInit(): void {
+    // Optional: Subscribe to form changes to clear global errors on input
+    this.loginForm.valueChanges.subscribe(() => {
+      this.notificationMessage = ''; // Clear any global error on change
+    });
+  }
+
+  onInput(fieldName: string): void {
+    const control = this.loginForm.get(fieldName);
+    if (control) {
+      control.markAsTouched();
+    }
+  }
 
   togglePasswordVisibility() {
     this.showPassword = !this.showPassword;
@@ -29,39 +50,47 @@ export class LoginComponent {
     this.notificationMessage = message;
     this.showNotification = true;
 
+    // Clear previous timeout
+    if (this.timeoutId) {
+      clearTimeout(this.timeoutId);
+    }
+
     // Auto-hide after 4 seconds for success, 5 seconds for error
-    setTimeout(() => {
+    this.timeoutId = setTimeout(() => {
       this.hideNotification();
     }, type === 'success' ? 4000 : 5000);
   }
 
   hideNotification() {
     this.showNotification = false;
+    if (this.timeoutId) {
+      clearTimeout(this.timeoutId);
+      this.timeoutId = null;
+    }
   }
 
   login() {
-    // Validation
-    if (!this.email || !this.password) {
-      this.showNotificationModal('error', 'Please fill in all required fields');
-      return;
-    }
+    // Mark all fields as touched for validation display
+    Object.keys(this.loginForm.controls).forEach(key => {
+      this.loginForm.get(key)?.markAsTouched();
+    });
 
-    // Email format validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(this.email)) {
-      this.showNotificationModal('error', 'Please enter a valid email address');
+    // Validate form
+    if (this.loginForm.invalid) {
+      this.showNotificationModal('error', 'Please fill in all required fields correctly');
       return;
     }
 
     this.isLoading = true;
 
-    this.authService.login(this.email, this.password).subscribe({
+    const formValue = this.loginForm.value;
+    this.authService.login(formValue.email.trim(), formValue.password).subscribe({
       next: (res: any) => {
         try {
           // Store token and role
           localStorage.setItem('token', res.data.token);
           localStorage.setItem('role', res.data.user.role);
-          localStorage.setItem('salonId', JSON.stringify(res.data.user.salonId || ''));
+          localStorage.setItem('salonId', res.data.user.salonId);
 
           // Store complete user details
           localStorage.setItem('user', JSON.stringify(res.data.user));
@@ -126,6 +155,9 @@ export class LoginComponent {
 
   ngOnDestroy() {
     // Clear any pending timeouts when component is destroyed
+    if (this.timeoutId) {
+      clearTimeout(this.timeoutId);
+    }
     this.hideNotification();
   }
 }
