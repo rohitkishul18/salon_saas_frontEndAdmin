@@ -22,7 +22,7 @@ export class UserComponent implements OnInit {
 
   // Pagination
   currentPage = 1;
-  itemsPerPage = 10;
+  itemsPerPage = 5;
   totalItems = 0;
   totalPages = 0;
 

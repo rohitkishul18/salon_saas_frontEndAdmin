@@ -136,7 +136,7 @@ export class LoginComponent implements OnInit, OnDestroy {
         } else if (err.status === 401) {
           errorMessage = 'Invalid email or password. Please try again.';
         } else if (err.status === 403) {
-          errorMessage = 'Access denied. Your account may be inactive or suspended.';
+          errorMessage = 'Access denied. Your account may be inactive or suspended by superadmin.';
         } else if (err.status === 404) {
           errorMessage = 'User not found. Please check your credentials.';
         } else if (err.status === 429) {

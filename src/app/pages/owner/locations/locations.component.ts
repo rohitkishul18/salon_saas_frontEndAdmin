@@ -5,10 +5,9 @@ import { LocationService } from '../../../core/services/location.service';
 @Component({
   selector: 'app-locations',
   templateUrl: './locations.component.html',
-  styleUrls: ['./locations.component.scss']
+  styleUrls: ['./locations.component.scss'],
 })
 export class LocationsComponent implements OnInit {
-
   locations: any[] = [];
   loading = false;
 
@@ -26,7 +25,7 @@ export class LocationsComponent implements OnInit {
     address: '',
     phone: '',
     openingTime: '',
-    closingTime: ''
+    closingTime: '',
   };
 
   editId: string = '';
@@ -38,7 +37,7 @@ export class LocationsComponent implements OnInit {
     title: '',
     message: '',
     showConfirm: false,
-    onConfirm: undefined
+    onConfirm: undefined,
   };
 
   constructor(private locationService: LocationService) {}
@@ -47,17 +46,17 @@ export class LocationsComponent implements OnInit {
     this.loadLocations();
   }
 
-  /**
-   * Show notification modal
-   */
-  showNotification(type: 'success' | 'error' | 'confirm', title: string, message: string, showConfirm = false, onConfirm?: () => void) {
+  showNotification(
+    type: 'success' | 'error' | 'confirm',
+    title: string,
+    message: string,
+    showConfirm = false,
+    onConfirm?: () => void
+  ) {
     this.notification = { type, title, message, showConfirm, onConfirm };
     this.showNotificationModal = true;
   }
 
-  /**
-   * Close notification modal
-   */
   closeNotification() {
     this.showNotificationModal = false;
     this.notification = {
@@ -65,13 +64,10 @@ export class LocationsComponent implements OnInit {
       title: '',
       message: '',
       showConfirm: false,
-      onConfirm: undefined
+      onConfirm: undefined,
     };
   }
 
-  /**
-   * Load locations with pagination
-   */
   loadLocations(page?: number) {
     const p = page || this.currentPage;
     this.loading = true;
@@ -80,15 +76,17 @@ export class LocationsComponent implements OnInit {
       next: (res: any) => {
         console.log('Locations fetched:', res);
         this.locations = res.data?.data || res.data || [];
-        this.totalItems = res.data?.pagination?.total || res.pagination?.total || 0;
-        this.totalPages = res.data?.pagination?.pages || res.pagination?.pages || 0;
+        this.totalItems =
+          res.data?.pagination?.total || res.pagination?.total || 0;
+        this.totalPages =
+          res.data?.pagination?.pages || res.pagination?.pages || 0;
         this.currentPage = p;
         this.loading = false;
       },
       error: () => {
         this.loading = false;
         this.showNotification('error', 'Error', 'Failed to load locations');
-      }
+      },
     });
   }
 
@@ -102,7 +100,11 @@ export class LocationsComponent implements OnInit {
     const range = [];
     const rangeWithEllipsis = [];
 
-    for (let i = Math.max(2, this.currentPage - delta); i <= Math.min(this.totalPages - 1, this.currentPage + delta); i++) {
+    for (
+      let i = Math.max(2, this.currentPage - delta);
+      i <= Math.min(this.totalPages - 1, this.currentPage + delta);
+      i++
+    ) {
       range.push(i);
     }
 
@@ -120,7 +122,7 @@ export class LocationsComponent implements OnInit {
       rangeWithEllipsis.push(this.totalPages);
     }
 
-    return rangeWithEllipsis.filter(p => p !== -1); // Filter out ellipsis for now; can add logic to show '...' if needed
+    return rangeWithEllipsis.filter((p) => p !== -1);
   }
 
   getShowingFrom(): number {
@@ -131,18 +133,12 @@ export class LocationsComponent implements OnInit {
     return Math.min(this.currentPage * this.itemsPerPage, this.totalItems);
   }
 
-  /**
-   * Open modal for adding a new location
-   */
   openAddModal() {
     this.isEdit = false;
     this.resetForm();
     this.showModal = true;
   }
 
-  /**
-   * Open modal for editing an existing location
-   */
   openEditModal(loc: any) {
     this.isEdit = true;
     this.editId = loc._id;
@@ -154,36 +150,27 @@ export class LocationsComponent implements OnInit {
       address: loc.address,
       phone: loc.phone,
       openingTime: parts[0] || '',
-      closingTime: parts[1] || ''
+      closingTime: parts[1] || '',
     };
 
     this.showModal = true;
   }
 
-  /**
-   * Close the modal and reset the form
-   */
   closeModal() {
     this.showModal = false;
     this.resetForm();
   }
 
-  /**
-   * Reset the form to initial state
-   */
   private resetForm() {
     this.form = {
       name: '',
       address: '',
       phone: '',
       openingTime: '',
-      closingTime: ''
+      closingTime: '',
     };
   }
 
-  /**
-   * Save location (create or update based on edit mode)
-   */
   saveLocation() {
     if (this.isEdit) {
       this.updateLocation();
@@ -192,86 +179,89 @@ export class LocationsComponent implements OnInit {
     }
   }
 
-  /**
-   * Create a new location
-   */
   createLocation() {
     const payload = {
       name: this.form.name,
       address: this.form.address,
       phone: this.form.phone,
-      openingHours: `${this.form.openingTime} - ${this.form.closingTime}`
+      openingHours: `${this.form.openingTime} - ${this.form.closingTime}`,
     };
 
     this.locationService.createLocation(payload).subscribe({
       next: () => {
-        this.showNotification('success', 'Success', 'Location added successfully');
+        this.showNotification(
+          'success',
+          'Success',
+          'Location added successfully'
+        );
         this.closeModal();
         this.loadLocations(); // Reload current page
       },
-      error: () => this.showNotification('error', 'Error', 'Failed to add location')
+      error: () =>
+        this.showNotification('error', 'Error', 'Failed to add location'),
     });
   }
 
-  /**
-   * Update an existing location
-   */
   updateLocation() {
     const payload = {
       name: this.form.name,
       address: this.form.address,
       phone: this.form.phone,
-      openingHours: `${this.form.openingTime} - ${this.form.closingTime}`
+      openingHours: `${this.form.openingTime} - ${this.form.closingTime}`,
     };
 
     this.locationService.updateLocation(this.editId, payload).subscribe({
       next: () => {
-        this.showNotification('success', 'Success', 'Location updated successfully');
+        this.showNotification(
+          'success',
+          'Success',
+          'Location updated successfully'
+        );
         this.closeModal();
         this.loadLocations(); // Reload current page
       },
-      error: () => this.showNotification('error', 'Error', 'Failed to update location')
+      error: () =>
+        this.showNotification('error', 'Error', 'Failed to update location'),
     });
   }
 
-  /**
-   * Delete a location with confirmation
-   */
   deleteLocation(loc: any) {
     this.showNotification(
-      'confirm', 
-      'Confirm Delete', 
-      `Are you sure you want to delete "${loc.name}" branch? This branch will be permanently deleted.`, 
-      true, 
+      'confirm',
+      'Confirm Delete',
+      `Are you sure you want to delete "${loc.name}" branch? This branch will be permanently deleted.`,
+      true,
       () => {
         this.locationService.deleteLocation(loc._id).subscribe({
           next: () => {
-            this.showNotification('success', 'Success', 'Location deleted successfully');
+            this.showNotification(
+              'success',
+              'Success',
+              'Location deleted successfully'
+            );
             this.loadLocations(); // Reload current page
           },
           error: () => {
-            this.showNotification('error', 'Error', 'Failed to delete location');
-          }
+            this.showNotification(
+              'error',
+              'Error',
+              'Failed to delete location'
+            );
+          },
         });
       }
     );
   }
 
-  /**
-   * Get initials from location name for avatar
-   */
   getLocationInitial(name: string): string {
     return name
       .split(' ')
-      .map(n => n[0])
+      .map((n) => n[0])
       .join('')
       .toUpperCase()
       .slice(0, 2);
   }
 
-  /**
-   * Format timing for display in 12-hour format (e.g., 10:00 AM - 8:00 PM)
-   */
   getFormattedTiming(loc: any): string {
     const timing = loc.openingHours || loc.timing || '';
     if (!timing) return '';
@@ -284,9 +274,6 @@ export class LocationsComponent implements OnInit {
     return `${openFormatted} - ${closeFormatted}`;
   }
 
-  /**
-   * Convert 24-hour time string to 12-hour format with AM/PM
-   */
   private formatTimeTo12hr(time24: string): string {
     if (!time24 || !time24.includes(':')) return time24;
     const [hours, minutes] = time24.split(':');
