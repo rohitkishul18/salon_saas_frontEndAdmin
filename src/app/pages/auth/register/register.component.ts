@@ -1,5 +1,6 @@
-// Updated register.component.ts
-import { Component } from '@angular/core';
+// Updated register.component.ts with Reactive Forms
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators, AbstractControl, ValidatorFn } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../core/services/auth.service';
 
@@ -8,21 +9,63 @@ import { AuthService } from '../../../core/services/auth.service';
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.scss']
 })
-export class RegisterComponent {
-  // Form fields
-  salonName: string = '';
-  ownerName: string = '';
-  email: string = '';
-  phone: string = '';
-  password: string = '';
-  termsAccepted: boolean = false;
+export class RegisterComponent implements OnInit {
+  registerForm: FormGroup;
   isLoading: boolean = false;
   errorMessage: string = '';
-  fieldErrors: { [key: string]: string } = {};
   showTermsModal: boolean = false;
   showPassword: boolean = false; 
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(private fb: FormBuilder, private authService: AuthService, private router: Router) {
+    this.registerForm = this.fb.group({
+      salonName: ['', [Validators.required, Validators.minLength(3)]],
+      ownerName: ['', [Validators.required, Validators.minLength(2), Validators.pattern(/^[a-zA-Z\s]+$/)]],
+      email: ['', [Validators.required, Validators.email]],
+      phone: ['', [Validators.required, this.phoneValidator()]],
+      password: ['', [Validators.required, Validators.minLength(8), Validators.pattern(/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/)]],
+      terms: [false, [Validators.requiredTrue]]
+    });
+  }
+
+  ngOnInit(): void {
+    // Optional: Subscribe to form changes for real-time validation if needed
+    this.registerForm.valueChanges.subscribe(() => {
+      this.errorMessage = ''; // Clear global error on any change
+    });
+  }
+
+  // Custom validator for phone
+  private phoneValidator(): ValidatorFn {
+    return (control: AbstractControl): { [key: string]: any } | null => {
+      if (!control.value || control.value.trim().length === 0) {
+        return { required: true };
+      }
+      const phoneDigits = control.value.replace(/\D/g, '');
+      if (phoneDigits.length !== 10) {
+        return { phoneDigits: true };
+      }
+      if (!/^\d{10}$/.test(phoneDigits)) {
+        return { phonePattern: true };
+      }
+      return null;
+    };
+  }
+
+  onInput(fieldName: string): void {
+    const control = this.registerForm.get(fieldName);
+    if (control) {
+      control.markAsTouched();
+    }
+    this.errorMessage = ''; // Clear global error on input
+  }
+
+  onTermsChange(): void {
+    const termsControl = this.registerForm.get('terms');
+    if (termsControl) {
+      termsControl.markAsTouched();
+    }
+    this.errorMessage = ''; // Clear global error on change
+  }
 
   togglePassword(): void {
     this.showPassword = !this.showPassword;
@@ -34,82 +77,6 @@ export class RegisterComponent {
 
   closeTermsModal(): void {
     this.showTermsModal = false;
-  }
-
-  private validateForm(): boolean {
-    this.fieldErrors = {};
-    this.errorMessage = '';
-    let isValid = true;
-
-    // Salon Name validation
-    if (!this.salonName || this.salonName.trim().length === 0) {
-      this.fieldErrors['salonName'] = 'Salon name is required';
-      isValid = false;
-    } else if (this.salonName.trim().length < 3) {
-      this.fieldErrors['salonName'] = 'Salon name must be at least 3 characters';
-      isValid = false;
-    }
-
-    // Owner Name validation
-    if (!this.ownerName || this.ownerName.trim().length === 0) {
-      this.fieldErrors['ownerName'] = 'Owner name is required';
-      isValid = false;
-    } else if (this.ownerName.trim().length < 2) {
-      this.fieldErrors['ownerName'] = 'Owner name must be at least 2 characters';
-      isValid = false;
-    } else if (!/^[a-zA-Z\s]+$/.test(this.ownerName.trim())) {
-      this.fieldErrors['ownerName'] = 'Owner name should only contain letters';
-      isValid = false;
-    }
-
-    // Email validation
-    if (!this.email || this.email.trim().length === 0) {
-      this.fieldErrors['email'] = 'Email is required';
-      isValid = false;
-    } else if (!this.isValidEmail(this.email)) {
-      this.fieldErrors['email'] = 'Please enter a valid email address';
-      isValid = false;
-    }
-
-    // Phone validation (required)
-    if (!this.phone || this.phone.trim().length === 0) {
-      this.fieldErrors['phone'] = 'Phone number is required';
-      isValid = false;
-    } else {
-      const phoneDigits = this.phone.replace(/\D/g, '');
-      if (phoneDigits.length !== 10) {
-        this.fieldErrors['phone'] = 'Phone number must be 10 digits';
-        isValid = false;
-      } else if (!/^\d{10}$/.test(phoneDigits)) {
-        this.fieldErrors['phone'] = 'Phone number must contain only digits';
-        isValid = false;
-      }
-    }
-
-    // Password validation
-    if (!this.password || this.password.length === 0) {
-      this.fieldErrors['password'] = 'Password is required';
-      isValid = false;
-    } else if (this.password.length < 8) {
-      this.fieldErrors['password'] = 'Password must be at least 8 characters';
-      isValid = false;
-    } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(this.password)) {
-      this.fieldErrors['password'] = 'Password must contain uppercase, lowercase, and number';
-      isValid = false;
-    }
-
-    // Terms acceptance validation
-    if (!this.termsAccepted) {
-      this.errorMessage = 'Please accept the terms and conditions';
-      isValid = false;
-    }
-
-    return isValid;
-  }
-
-  private isValidEmail(email: string): boolean {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email.trim());
   }
 
   private storeUserData(responseData: any): void {
@@ -136,7 +103,6 @@ export class RegisterComponent {
     }
   }
 
-
   private navigateBasedOnRole(role: string): void {
     switch (role) {
       case 'superadmin':
@@ -150,18 +116,15 @@ export class RegisterComponent {
     }
   }
 
-  clearFieldError(fieldName: string): void {
-    if (this.fieldErrors[fieldName]) {
-      delete this.fieldErrors[fieldName];
-    }
-    if (this.errorMessage) {
-      this.errorMessage = '';
-    }
-  }
-
   register(): void {
+    // Mark all fields as touched for validation display
+    Object.keys(this.registerForm.controls).forEach(key => {
+      this.registerForm.get(key)?.markAsTouched();
+    });
+
     // Validate form
-    if (!this.validateForm()) {
+    if (this.registerForm.invalid) {
+      this.errorMessage = this.registerForm.get('terms')?.invalid ? 'Please accept the terms and conditions' : '';
       return;
     }
 
@@ -169,13 +132,14 @@ export class RegisterComponent {
     this.isLoading = true;
     this.errorMessage = '';
 
-    // Prepare payload
+    // Prepare payload (trim values manually)
+    const formValue = this.registerForm.value;
     const payload = {
-      salonName: this.salonName.trim(),
-      ownerName: this.ownerName.trim(),
-      email: this.email.trim().toLowerCase(),
-      phone: this.phone.trim(),
-      password: this.password
+      salonName: formValue.salonName.trim(),
+      ownerName: formValue.ownerName.trim(),
+      email: formValue.email.trim().toLowerCase(),
+      phone: formValue.phone.trim(),
+      password: formValue.password
     };
 
     // Call registration API

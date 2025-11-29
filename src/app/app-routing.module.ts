@@ -29,6 +29,7 @@ const routes: Routes = [
   path: 'superadmin',
   component: LayoutdashbordComponent,
   canActivate: [authGuard],
+  canActivateChild: [authGuard],
   data: { roles: ['superadmin'] },
   children: [
     { path: '', redirectTo: 'layoutdashbord', pathMatch: 'full' },
@@ -41,6 +42,7 @@ const routes: Routes = [
   path: 'salon-owner',
   component: SalonInfoComponent,
   canActivate: [authGuard],
+  canActivateChild: [authGuard],
   data: { roles: ['salon-owner'] },
   children: [
     { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
