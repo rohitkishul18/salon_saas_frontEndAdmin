@@ -20,6 +20,7 @@ export class NavbarComponent implements OnInit {
   userRole: string = '';
   userEmail: string = '';
   isLoading: boolean = true;
+  showLogoutModal: boolean = false;
 
   constructor(private router: Router) {}
 
@@ -34,7 +35,9 @@ export class NavbarComponent implements OnInit {
       const role = localStorage.getItem('role');
       
       if (userDataString) {
-        const userData: UserData = JSON.parse(userDataString);
+        console.log('User Data:', userDataString);
+        const userData: any = JSON.parse(userDataString);
+        console.log('Parsed User Data:', userData);
         this.userName = userData.name || 'User';
         this.userRole = userData.role || role || 'guest';
         this.userEmail = userData.email || '';
@@ -75,9 +78,18 @@ export class NavbarComponent implements OnInit {
     return 'Good Evening';
   }
 
-  logout(): void {
+  openLogoutModal(): void {
+    this.showLogoutModal = true;
+  }
+
+  closeLogoutModal(): void {
+    this.showLogoutModal = false;
+  }
+
+  confirmLogout(): void {
     // Clear all user-related data
     localStorage.clear();
     this.router.navigate(['/login']);
+    this.showLogoutModal = false;
   }
 }

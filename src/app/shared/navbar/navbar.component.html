@@ -25,7 +25,7 @@
         <!-- Logout Button -->
         <button 
           class="logout-btn"
-          (click)="logout()"
+          (click)="openLogoutModal()"
           aria-label="Logout"
         >
           <span class="icon">🚪</span>
@@ -38,6 +38,24 @@
     <div class="user-section loading" *ngIf="isLoading">
       <div class="skeleton-text"></div>
       <div class="skeleton-badge"></div>
+    </div>
+  </div>
+
+  <!-- Logout Confirmation Modal -->
+  <div class="logout-modal" *ngIf="showLogoutModal">
+    <div class="modal-overlay" (click)="closeLogoutModal()"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <span class="modal-icon">⚠️</span>
+        <h3 class="modal-title">Confirm Logout</h3>
+      </div>
+      <div class="modal-body">
+        <p class="modal-message">Are you sure you want to log out? You will need to sign in again to access your account.</p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-secondary" (click)="closeLogoutModal()">Cancel</button>
+        <button class="btn-primary" (click)="confirmLogout()">Yes, Log Out</button>
+      </div>
     </div>
   </div>
 </nav>
