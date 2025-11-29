@@ -56,11 +56,7 @@ export class NavbarComponent implements OnInit {
   getRoleDisplayName(): string {
     const roleMap: { [key: string]: string } = {
       'salon-owner': 'Salon Owner',
-      'admin': 'Administrator',
-      'staff': 'Staff Member',
-      'manager': 'Manager',
-      'receptionist': 'Receptionist',
-      'stylist': 'Stylist'
+      'superadmin': 'Super Admin',
     };
     return roleMap[this.userRole] || this.formatRole(this.userRole);
   }
